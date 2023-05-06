@@ -7,8 +7,10 @@ matplotlib.use('Qt5Agg')
 
 import matplotlib.pyplot as plt
 
+DISCARDED_WIDTH_EACH_SIDE = 10.0
+
 HEIGHT = 5.0
-WIDTH = 50.0
+WIDTH = 50.0 + DISCARDED_WIDTH_EACH_SIDE * 2
 
 X_BOTTOM_LEFT, Y_BOTTOM_LEFT = (0.0, 0.0)
 X_TOP_RIGHT, Y_TOP_RIGHT = (WIDTH, HEIGHT)
@@ -28,9 +30,9 @@ def main():
         Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT),
         Point(X_TOP_RIGHT, Y_BOTTOM_LEFT),
         Point(X_TOP_RIGHT, Y_TOP_RIGHT), 
-        Point(30.0, Y_TOP_RIGHT), 
-        Point(25.0, 2.5),
-        Point(20.0, Y_TOP_RIGHT),
+        Point(40.0, Y_TOP_RIGHT), 
+        Point(35.0, 2.5),
+        Point(30.0, Y_TOP_RIGHT),
         Point(X_BOTTOM_LEFT, Y_TOP_RIGHT),
         Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT)
     ]
@@ -93,26 +95,27 @@ def main():
         u_solution,
         boundary_conditions
     )
+
+    u_solution.set_allow_extrapolation(True)
     
-    # c = plot(u_solution)
+    # c = plot(fe.grad(u_solution))
     # plt.gca().set_aspect('equal')
     # plt.colorbar(c, fraction=0.047*1/5)
     # plt.show()
 
     # Create submesh
-    # Generate submesh
-    x_left = 5.0
-    x_right = 45.0
+    x_left = DISCARDED_WIDTH_EACH_SIDE
+    x_right = WIDTH - DISCARDED_WIDTH_EACH_SIDE
     submesh_vertices = [
         Point(x_left, Y_BOTTOM_LEFT),
         Point(x_right, Y_BOTTOM_LEFT),
         Point(x_right, Y_TOP_RIGHT), 
-        Point(30.0, Y_TOP_RIGHT), 
-        Point(25.0, 2.5),
-        Point(20.0, Y_TOP_RIGHT),
+        Point(40.0, Y_TOP_RIGHT), 
+        Point(35.0, 2.5),
+        Point(30.0, Y_TOP_RIGHT),
         Point(x_left, Y_TOP_RIGHT),
         Point(x_left, Y_BOTTOM_LEFT)
-    ]
+    ]   
 
     subdomain = ms.Polygon(submesh_vertices)
     mesh_sub = ms.generate_mesh(subdomain, MESH_RESOLUTION)
@@ -120,17 +123,14 @@ def main():
     # Restrict solution to submesh
     u_sub = fe.Function(lagrange_function_space_second_order)
     u_sub.assign(fe.interpolate(u_solution, fe.FunctionSpace(mesh_sub, 'CG', FS_DEGREE)))
+    u_sub.set_allow_extrapolation(True)
 
+    lagrange_vector_space_second_order = fe.VectorFunctionSpace(mesh, 'CG', FS_DEGREE)
 
-    # TODO: this fails with some compilation error - fenics bug
-    # V = u_sub.function_space()
-    # mesh = V.mesh()
-    # degree = V.ufl_element().degree()
-    # W = fe.VectorFunctionSpace(mesh, 'CG', degree)
+    grad_u_sub = fe.project(fe.grad(u_sub), lagrange_vector_space_second_order)
+    magnitude_grad_u_sub = fe.project(fe.sqrt(fe.dot(grad_u_sub, grad_u_sub)), lagrange_function_space_second_order)
 
-    # grad_u_sub = fe.project(fe.grad(u_sub), W)
-
-    c = plot(u_sub)
+    c = plot(magnitude_grad_u_sub, cmap='inferno')
     plt.gca().set_aspect('equal')
     plt.colorbar(c, fraction=0.047*1/5)
     plt.show()
