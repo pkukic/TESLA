@@ -7,8 +7,6 @@ matplotlib.use('Qt5Agg')
 
 import matplotlib.pyplot as plt
 
-import math
-
 HEIGHT = 5.0
 WIDTH = 50.0
 
@@ -123,6 +121,8 @@ def main():
     u_sub = fe.Function(lagrange_function_space_second_order)
     u_sub.assign(fe.interpolate(u_solution, fe.FunctionSpace(mesh_sub, 'CG', FS_DEGREE)))
 
+
+    # TODO: this fails with some compilation error - fenics bug
     # V = u_sub.function_space()
     # mesh = V.mesh()
     # degree = V.ufl_element().degree()
