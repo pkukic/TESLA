@@ -57,7 +57,7 @@ def sigma_f_from_vals(sigma_vals):
 #     fe.AutoSubDomain(bottom).mark(boundary_markers, 1)
 #     dss = fe.Measure("ds", subdomain_data=boundary_markers)
 #     n = fe.FacetNormal(constants.mesh_sub())
-#     return fe.dot((sigma_sub * e_vect), n) * dss(1) * fe.Constant(constants.A_F)
+#     return fe.assemble(sigma * fe.dot(e_vect, n) * dss(1) * fe.Constant(constants.A_F))
 
 
 if __name__ == '__main__':
