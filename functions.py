@@ -49,6 +49,8 @@ def sigma_f_from_vals(sigma_vals):
 
     return new_sigma_wider
 
+def J(sigma, e):
+    return fe.Expression("sigma * e", sigma=sigma, e=e, domain=constants.lagrange_vector_sub_space_second_order())
 
 if __name__ == '__main__':
     sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=constants.SIGMA_HRS, domain=constants.mesh())
