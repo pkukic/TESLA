@@ -12,6 +12,8 @@ import poisson
 import constants
 import utils
 
+from scipy import spatial
+
 def G(electric_field_values):
     return constants.G_0 * np.exp(-(constants.E_A - constants.B * electric_field_values) / (constants.K_B * constants.T))
 
@@ -62,4 +64,17 @@ if __name__ == '__main__':
     print(coords[np.argmax(pc_values)], np.max(pc_values))
     print(coords[np.argmax(new_sigma_values)], np.max(new_sigma_values))
 
+
+    # class SigmaExpr(fe.UserExpression):
+    #     def eval(self, value, x):
+    #         _, index = spatial.KDTree(coords).query(x)
+    #         value[0] = new_sigma_values[index]
     
+    # s = SigmaExpr()
+    # new_sigma_function = fe.Function(lagrange_function_sub_space_second_order)
+    # new_sigma_function.assign(fe.interpolate(s, lagrange_function_sub_space_second_order))
+
+    # c = plot(new_sigma_function, cmap='inferno')
+    # plt.gca().set_aspect('equal')
+    # plt.colorbar(c, fraction=0.047*1/10)
+    # plt.show()
