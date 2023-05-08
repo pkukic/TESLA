@@ -23,23 +23,8 @@ BOTTOM_POTENTIAL = 0.0
 
 SIGMA_HRS = 3.0 * 1e6 # S/nm
 
-def main():
 
-    # Domain
-    domain_vertices = [
-        Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT),
-        Point(X_TOP_RIGHT, Y_BOTTOM_LEFT),
-        Point(X_TOP_RIGHT, Y_TOP_RIGHT), 
-        Point(40.0, Y_TOP_RIGHT), 
-        Point(35.0, 2.5),
-        Point(30.0, Y_TOP_RIGHT),
-        Point(X_BOTTOM_LEFT, Y_TOP_RIGHT),
-        Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT)
-    ]
-
-    domain = ms.Polygon(domain_vertices)
-    mesh = ms.generate_mesh(domain, MESH_RESOLUTION)
-
+def E_from_sigma(sigma, mesh, mesh_sub):
     # Function space
     lagrange_function_space_second_order = fe.FunctionSpace(
         mesh,
@@ -77,7 +62,7 @@ def main():
     v_test = fe.TestFunction(lagrange_function_space_second_order)
 
     # Weak form
-    sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=SIGMA_HRS, domain=mesh)
+    
     n = fe.FacetNormal(mesh)
     weak_form_lhs = (
         sigma * fe.dot(fe.grad(u_trial) * v_test, n) * fe.ds
@@ -97,13 +82,45 @@ def main():
     )
 
     u_solution.set_allow_extrapolation(True)
-    
-    # c = plot(fe.grad(u_solution))
-    # plt.gca().set_aspect('equal')
-    # plt.colorbar(c, fraction=0.047*1/5)
-    # plt.show()
 
-    # Create submesh
+    # Restrict solution to submesh
+    lagrange_function_sub_space_second_order = fe.FunctionSpace(
+        mesh_sub,
+        'CG', 
+        FS_DEGREE
+    )
+
+    u_sub = fe.Function(lagrange_function_sub_space_second_order)
+    u_sub.assign(fe.interpolate(u_solution, lagrange_function_sub_space_second_order))
+    u_sub.set_allow_extrapolation(True)
+
+    lagrange_vector_sub_space_second_order = fe.VectorFunctionSpace(
+        mesh_sub, 
+        'CG', 
+        FS_DEGREE
+    )
+
+    grad_u_sub = fe.project(fe.grad(u_sub), lagrange_vector_sub_space_second_order)
+    magnitude_grad_u_sub = fe.project(fe.sqrt(fe.dot(grad_u_sub, grad_u_sub)), lagrange_function_sub_space_second_order)
+
+    return magnitude_grad_u_sub
+
+
+if __name__ == '__main__':
+    domain_vertices = [
+        Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT),
+        Point(X_TOP_RIGHT, Y_BOTTOM_LEFT),
+        Point(X_TOP_RIGHT, Y_TOP_RIGHT), 
+        Point(40.0, Y_TOP_RIGHT), 
+        Point(35.0, 2.5),
+        Point(30.0, Y_TOP_RIGHT),
+        Point(X_BOTTOM_LEFT, Y_TOP_RIGHT),
+        Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT)
+    ]
+
+    domain = ms.Polygon(domain_vertices)
+    mesh = ms.generate_mesh(domain, MESH_RESOLUTION)
+
     x_left = DISCARDED_WIDTH_EACH_SIDE
     x_right = WIDTH - DISCARDED_WIDTH_EACH_SIDE
     submesh_vertices = [
@@ -120,22 +137,14 @@ def main():
     subdomain = ms.Polygon(submesh_vertices)
     mesh_sub = ms.generate_mesh(subdomain, MESH_RESOLUTION)
 
-    # Restrict solution to submesh
-    u_sub = fe.Function(lagrange_function_space_second_order)
-    u_sub.assign(fe.interpolate(u_solution, fe.FunctionSpace(mesh_sub, 'CG', FS_DEGREE)))
-    u_sub.set_allow_extrapolation(True)
+    sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=SIGMA_HRS, domain=mesh)
 
-    lagrange_vector_space_second_order = fe.VectorFunctionSpace(mesh, 'CG', FS_DEGREE)
+    e = E_from_sigma(sigma, mesh, mesh_sub)
 
-    grad_u_sub = fe.project(fe.grad(u_sub), lagrange_vector_space_second_order)
-    magnitude_grad_u_sub = fe.project(fe.sqrt(fe.dot(grad_u_sub, grad_u_sub)), lagrange_function_space_second_order)
-
-    c = plot(magnitude_grad_u_sub, cmap='inferno')
+    c = plot(e, cmap='inferno')
     plt.gca().set_aspect('equal')
-    plt.colorbar(c, fraction=0.047*1/5)
+    plt.colorbar(c, fraction=0.047*1/10)
     plt.show()
 
-    return
 
-if __name__ == '__main__':
-    main()
+
