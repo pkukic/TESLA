@@ -66,17 +66,8 @@ if __name__ == '__main__':
     print(coords[np.argmax(pc_values)], np.max(pc_values))
     print(coords[np.argmax(new_sigma_values)], np.max(new_sigma_values))
 
-    # fe.parameter.default_jit_parameters()[]
-
-    # class SigmaExpr(fe.UserExpression):
-    #     def eval(self, value, x):
-    #         _, index = spatial.KDTree(coords).query(x)
-    #         value[0] = new_sigma_values[index]
-    
-    # s = SigmaExpr()
     new_sigma_function = fe.Function(lagrange_function_sub_space_second_order)
     new_sigma_function.vector().set_local(new_sigma_values)
-    # new_sigma_function.assign(fe.interpolate(s, lagrange_function_sub_space_second_order))
 
     c = plot(new_sigma_function, cmap='inferno')
     plt.gca().set_aspect('equal')
