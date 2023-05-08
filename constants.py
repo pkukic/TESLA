@@ -1,8 +1,13 @@
 import fenics as fe
 import mshr as ms
-from dolfin import Point
+from dolfin import Point, parameters
 
 import utils
+
+import pickle
+import functools
+
+parameters["reorder_dofs_serial"] = False
 
 # All lengths are in angstroms
 DISCARDED_WIDTH_EACH_SIDE = 100.0
@@ -75,7 +80,6 @@ domain_vertices = [
 ]
 
 domain = ms.Polygon(domain_vertices)
-mesh = ms.generate_mesh(domain, MESH_RESOLUTION)
 
 x_left = DISCARDED_WIDTH_EACH_SIDE
 x_right = WIDTH - DISCARDED_WIDTH_EACH_SIDE
@@ -88,11 +92,135 @@ submesh_vertices = [
     Point(300.0, Y_TOP_RIGHT),
     Point(x_left, Y_TOP_RIGHT),
     Point(x_left, Y_BOTTOM_LEFT)
-]   
+]
 
 subdomain = ms.Polygon(submesh_vertices)
-mesh_sub = ms.generate_mesh(subdomain, MESH_RESOLUTION)
 
-mesh_avg_areas = utils.areas_from_mesh(mesh)
-mesh_sub_avg_areas = utils.areas_from_mesh(mesh_sub)
+@functools.lru_cache
+def mesh():
+    return ms.generate_mesh(domain, MESH_RESOLUTION)
 
+# @functools.lru_cache
+# def mesh():
+#     try:
+#         with open('mesh.pickle', 'rb') as f:
+#             mesh = pickle.load(f)
+#         return mesh
+#     except BaseException:
+#         mesh = ms.generate_mesh(domain, MESH_RESOLUTION)
+#         with open('mesh.pickle', 'wb+') as f:
+#             pickle.dump(mesh, f, pickle.HIGHEST_PROTOCOL)
+#         return mesh
+
+@functools.lru_cache
+def mesh_sub():
+    return ms.generate_mesh(subdomain, MESH_RESOLUTION)    
+
+# @functools.lru_cache
+# def mesh_sub():
+#     try:
+#         with open('mesh_sub.pickle', 'rb') as f:
+#             mesh_sub = pickle.load(f)
+#         return mesh_sub
+#     except BaseException:
+#         mesh_sub = ms.generate_mesh(subdomain, MESH_RESOLUTION)
+#         with open('mesh_sub.pickle', 'wb+') as f:
+#             pickle.dump(mesh_sub, f, pickle.HIGHEST_PROTOCOL)
+#         return mesh_sub
+
+
+@functools.lru_cache
+def mesh_avg_areas():
+    try:
+        with open('mesh_avg_areas.pickle', 'rb') as f:
+            mesh_avg_areas = pickle.load(f)
+        return mesh_avg_areas
+    except BaseException:
+        mesh_avg_areas = utils.areas_from_mesh(mesh())
+        with open('mesh_avg_areas.pickle', 'wb+') as f:
+            pickle.dump(mesh_avg_areas, f, pickle.HIGHEST_PROTOCOL)
+        return mesh_avg_areas
+
+
+@functools.lru_cache
+def mesh_sub_avg_areas():
+    try:
+        with open('mesh_sub_avg_areas.pickle', 'rb') as f:
+            mesh_sub_avg_areas = pickle.load(f)
+        return mesh_sub_avg_areas
+    except BaseException:
+        mesh_sub_avg_areas = utils.areas_from_mesh(mesh_sub())
+        with open('mesh_sub_avg_areas.pickle', 'wb+') as f:
+            pickle.dump(mesh_sub_avg_areas, f, pickle.HIGHEST_PROTOCOL)
+        return mesh_sub_avg_areas
+
+@functools.lru_cache
+def lagrange_function_space_second_order():
+    return fe.FunctionSpace(
+            mesh(),
+            'CG',
+            FS_DEGREE
+    )
+
+# @functools.lru_cache
+# def lagrange_function_space_second_order():
+#     try:
+#         with open('lagrange_function_space_second_order.pickle', 'rb') as f:
+#             lagrange_function_space_second_order = pickle.load(f)
+#         return lagrange_function_space_second_order
+#     except BaseException:
+#         lagrange_function_space_second_order = fe.FunctionSpace(
+#             mesh(),
+#             'CG',
+#             FS_DEGREE
+#         )
+#         with open('lagrange_function_space_second_order.pickle', 'wb+') as f:
+#             pickle.dump(lagrange_function_space_second_order, f, pickle.HIGHEST_PROTOCOL)
+#         return lagrange_function_space_second_order
+
+def lagrange_function_sub_space_second_order():
+    return fe.FunctionSpace(
+        mesh_sub(),
+        'CG', 
+        FS_DEGREE
+    )
+
+# @functools.lru_cache
+# def lagrange_function_sub_space_second_order():
+#     try:
+#         with open('lagrange_function_sub_space_second_order.pickle', 'rb') as f:
+#             lagrange_function_sub_space_second_order = pickle.load(f)
+#         return lagrange_function_sub_space_second_order
+#     except BaseException:
+#         lagrange_function_sub_space_second_order = fe.FunctionSpace(
+#             mesh_sub(),
+#             'CG', 
+#             FS_DEGREE
+#         )
+#         with open('lagrange_function_sub_space_second_order.pickle', 'wb+') as f:
+#             pickle.dump(lagrange_function_sub_space_second_order, f, pickle.HIGHEST_PROTOCOL)
+#         return lagrange_function_sub_space_second_order
+
+@functools.lru_cache
+def lagrange_vector_sub_space_second_order():
+    return fe.VectorFunctionSpace(
+            mesh_sub(), 
+            'CG', 
+            FS_DEGREE
+    )
+
+# @functools.lru_cache
+# def lagrange_vector_sub_space_second_order():
+#     try:
+#         with open('lagrange_function_sub_space_second_order.pickle', 'rb') as f:
+#             lagrange_vector_sub_space_second_order = pickle.load(f)
+#         return lagrange_vector_sub_space_second_order
+#     except BaseException:
+#         lagrange_vector_sub_space_second_order = fe.VectorFunctionSpace(
+#             mesh_sub(), 
+#             'CG', 
+#             FS_DEGREE
+#         )
+#         with open('lagrange_vector_sub_space_second_order.pickle', 'wb+') as f:
+#             pickle.dump(lagrange_vector_sub_space_second_order, f, pickle.HIGHEST_PROTOCOL)
+#         return lagrange_vector_sub_space_second_order
