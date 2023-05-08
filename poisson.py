@@ -1,6 +1,5 @@
 import fenics as fe
-import mshr as ms
-from dolfin import Point, plot, parameters
+from dolfin import plot, parameters
 
 import matplotlib
 matplotlib.use('Qt5Agg')

@@ -1,6 +1,5 @@
 import fenics as fe
-import mshr as ms
-from dolfin import Point, plot, parameters
+from dolfin import plot, parameters
 
 import matplotlib
 matplotlib.use('Qt5Agg')
@@ -10,9 +9,6 @@ import numpy as np
 
 import poisson
 import constants
-import utils
-
-from scipy import spatial
 
 parameters["reorder_dofs_serial"] = False
 
@@ -49,8 +45,20 @@ def sigma_f_from_vals(sigma_vals):
 
     return new_sigma_wider
 
-def J(sigma, e):
-    return fe.Expression("sigma * e", sigma=sigma, e=e, domain=constants.lagrange_vector_sub_space_second_order())
+
+# boundary_markers = fe.MeshFunction("size_t", constants.mesh_sub(), constants.mesh_sub().topology().dim()-1)
+# boundary_markers.set_all(0)
+# def bottom(x, on_boundary):
+#     return on_boundary and fe.near(x[1], constants.Y_BOTTOM_LEFT)
+
+# def I(sigma, e_vect):
+#     sigma_sub = fe.Function(constants.lagrange_function_sub_space_second_order())
+#     sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space_second_order()))
+#     fe.AutoSubDomain(bottom).mark(boundary_markers, 1)
+#     dss = fe.Measure("ds", subdomain_data=boundary_markers)
+#     n = fe.FacetNormal(constants.mesh_sub())
+#     return fe.dot((sigma_sub * e_vect), n) * dss(1) * fe.Constant(constants.A_F)
+
 
 if __name__ == '__main__':
     sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=constants.SIGMA_HRS, domain=constants.mesh())
@@ -78,6 +86,9 @@ if __name__ == '__main__':
     print(coords[np.argmax(new_sigma_values)], np.max(new_sigma_values))
 
     new_sigma = sigma_f_from_vals(new_sigma_values)
+    
+    # i = I(new_sigma, e_vect)
+    # print(i)
 
     c = plot(new_sigma, cmap='inferno')
     plt.gca().set_aspect('equal')
