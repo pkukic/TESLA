@@ -1,6 +1,6 @@
 import fenics as fe
 import mshr as ms
-from dolfin import Point, plot
+from dolfin import Point, plot, parameters
 
 import matplotlib
 matplotlib.use('Qt5Agg')
@@ -8,6 +8,8 @@ matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 
 import constants
+
+parameters["reorder_dofs_serial"] = False
 
 def E_from_sigma(sigma, mesh, mesh_sub):
     # Function space

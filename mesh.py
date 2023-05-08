@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 
 MESH_RESOLUTION = 500
 
+parameters["reorder_dofs_serial"] = False
+
 if __name__ == '__main__':
     domain_vertices = [
         Point(0.0, 0.0),
