@@ -2,6 +2,8 @@ import fenics as fe
 import mshr as ms
 from dolfin import Point
 
+import utils
+
 # All lengths are in angstroms
 DISCARDED_WIDTH_EACH_SIDE = 100.0
 
@@ -24,8 +26,12 @@ SIGMA_HRS = 3.0 * 1e7
 SIGMA_LRS = 3.5 * 1e14
 
 # Pre-exponential factor
-# seconds / meter**3
-G_0 = 1e30
+# 1 / (seconds * angstrom**3)
+G_0 = 1.0
+
+# Area factor
+# In angstroms
+A_F = 500.0
 
 # Defect formation energy
 # In electron volts
@@ -47,13 +53,15 @@ K_B = 8.617 * 1e-5
 # In kelvin
 T = 300
 
+# Time simulation step
+# In seconds
+DELTA_T = 0.1
+
 # This is some 0-dimensional magic number
 MESH_RESOLUTION = 500
 
 # The Lagrangian elements are of degree 2
 FS_DEGREE = 2
-
-
 
 domain_vertices = [
     Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT),
@@ -84,4 +92,7 @@ submesh_vertices = [
 
 subdomain = ms.Polygon(submesh_vertices)
 mesh_sub = ms.generate_mesh(subdomain, MESH_RESOLUTION)
+
+mesh_avg_areas = utils.areas_from_mesh(mesh)
+mesh_sub_avg_areas = utils.areas_from_mesh(mesh_sub)
 
