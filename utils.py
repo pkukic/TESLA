@@ -1,9 +1,13 @@
 import numpy as np
 from dolfin import cells
 
+import functools
+
+@functools.lru_cache
 def triangle_area(a, b, c):
     return abs(0.5 * np.cross(b - a, c - a))
 
+@functools.lru_cache
 def areas_from_mesh(mesh):
     vertex_to_cell = {}
     for cell in cells(mesh):
