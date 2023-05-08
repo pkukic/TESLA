@@ -23,6 +23,10 @@ SIGMA_HRS = 3.0 * 1e7
 # In sieverts/angstrom
 SIGMA_LRS = 3.5 * 1e14
 
+# Pre-exponential factor
+# seconds / meter**3
+G_0 = 1e30
+
 # Defect formation energy
 # In electron volts
 E_A = 5.9
@@ -35,6 +39,13 @@ B = 91.8
 # In angstroms
 R = 1.4
 
+# Boltzmann constant
+# in electron volts / kelvin
+K_B = 8.617 * 1e-5
+
+# The temperature
+# In kelvin
+T = 300
 
 # This is some 0-dimensional magic number
 MESH_RESOLUTION = 500
