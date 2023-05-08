@@ -7,10 +7,10 @@ matplotlib.use('Qt5Agg')
 
 import matplotlib.pyplot as plt
 
-DISCARDED_WIDTH_EACH_SIDE = 10.0
+DISCARDED_WIDTH_EACH_SIDE = 100.0
 
-HEIGHT = 5.0
-WIDTH = 50.0 + DISCARDED_WIDTH_EACH_SIDE * 2
+HEIGHT = 50.0
+WIDTH = 500.0 + DISCARDED_WIDTH_EACH_SIDE * 2
 
 X_BOTTOM_LEFT, Y_BOTTOM_LEFT = (0.0, 0.0)
 X_TOP_RIGHT, Y_TOP_RIGHT = (WIDTH, HEIGHT)
@@ -111,9 +111,9 @@ if __name__ == '__main__':
         Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT),
         Point(X_TOP_RIGHT, Y_BOTTOM_LEFT),
         Point(X_TOP_RIGHT, Y_TOP_RIGHT), 
-        Point(40.0, Y_TOP_RIGHT), 
-        Point(35.0, 2.5),
-        Point(30.0, Y_TOP_RIGHT),
+        Point(400.0, Y_TOP_RIGHT), 
+        Point(350.0, 25.0),
+        Point(300.0, Y_TOP_RIGHT),
         Point(X_BOTTOM_LEFT, Y_TOP_RIGHT),
         Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT)
     ]
@@ -127,15 +127,18 @@ if __name__ == '__main__':
         Point(x_left, Y_BOTTOM_LEFT),
         Point(x_right, Y_BOTTOM_LEFT),
         Point(x_right, Y_TOP_RIGHT), 
-        Point(40.0, Y_TOP_RIGHT), 
-        Point(35.0, 2.5),
-        Point(30.0, Y_TOP_RIGHT),
+        Point(400.0, Y_TOP_RIGHT), 
+        Point(350.0, 25.0),
+        Point(300.0, Y_TOP_RIGHT),
         Point(x_left, Y_TOP_RIGHT),
         Point(x_left, Y_BOTTOM_LEFT)
     ]   
 
     subdomain = ms.Polygon(submesh_vertices)
     mesh_sub = ms.generate_mesh(subdomain, MESH_RESOLUTION)
+
+    # plot(mesh_sub)
+    # plt.show()
 
     sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=SIGMA_HRS, domain=mesh)
 
