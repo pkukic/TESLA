@@ -51,8 +51,9 @@ def sigma_f_from_vals(sigma_vals):
 
 
 if __name__ == '__main__':
-    sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=constants.SIGMA_HRS, domain=constants.mesh())    
-    e = poisson.E_from_sigma(sigma)
+    sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=constants.SIGMA_HRS, domain=constants.mesh())
+    e_vect = poisson.E_from_sigma(sigma)
+    e = poisson.magnitude_of_E(e_vect)
 
     sigma_sub = fe.Function(constants.lagrange_function_sub_space_second_order())
     sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space_second_order()))

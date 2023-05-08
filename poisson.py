@@ -69,15 +69,16 @@ def E_from_sigma(sigma):
     u_sub.set_allow_extrapolation(True)
 
     grad_u_sub = fe.project(fe.grad(u_sub), constants.lagrange_vector_sub_space_second_order())
-    magnitude_grad_u_sub = fe.project(fe.sqrt(fe.dot(grad_u_sub, grad_u_sub)), constants.lagrange_function_sub_space_second_order())
+    return grad_u_sub
 
-    return magnitude_grad_u_sub
-
+def magnitude_of_E(e_vect):
+    magnitude_e_vect = fe.project(fe.sqrt(fe.dot(e_vect, e_vect)), constants.lagrange_function_sub_space_second_order())
+    return magnitude_e_vect
 
 if __name__ == '__main__':
     sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=constants.SIGMA_HRS, domain=constants.mesh())
 
-    e = E_from_sigma(sigma)
+    e = magnitude_of_E(E_from_sigma(sigma))
 
     c = plot(e, cmap='inferno')
     plt.gca().set_aspect('equal')
