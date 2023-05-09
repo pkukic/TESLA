@@ -70,8 +70,15 @@ def I(sigma, e_vect):
 
 if __name__ == '__main__':
     sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=constants.SIGMA_HRS, domain=constants.mesh())
+
+    print('Solving Poisson equation...')
+
     e_vect = poisson.E_from_sigma(sigma)
     e = poisson.magnitude_of_E(e_vect)
+
+    print('Poisson equation solved.')
+
+    print('Computing G, P_c and sigma...')
 
     sigma_sub = fe.Function(constants.lagrange_function_sub_space_second_order())
     sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space_second_order()))
@@ -83,6 +90,8 @@ if __name__ == '__main__':
     pc_values = P_c(g_values, constants.mesh_sub_avg_areas())
     new_sigma_values = new_sigma_from_pc(pc_values, coords, sigma_sub_values)
 
+    print('Computed.')
+
     print(e_values)
     print(g_values)
     print(pc_values)
@@ -93,7 +102,11 @@ if __name__ == '__main__':
     print(coords[np.argmax(pc_values)], np.max(pc_values))
     print(coords[np.argmax(new_sigma_values)], np.max(new_sigma_values))
 
+    print('Computing new sigma...')
+
     new_sigma = sigma_f_from_vals(new_sigma_values)
+
+    print('Computed.')
 
     c = plot(new_sigma, cmap='inferno')
     plt.gca().set_aspect('equal')
