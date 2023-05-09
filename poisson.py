@@ -8,7 +8,10 @@ import matplotlib.pyplot as plt
 
 import constants
 
+# import time
+
 parameters["reorder_dofs_serial"] = False
+parameters["form_compiler"]["cpp_optimize"] = True
 
 def E_from_sigma(sigma):
     # Boundary conditions
@@ -57,7 +60,7 @@ def E_from_sigma(sigma):
     fe.solve(
         weak_form_lhs == weak_form_rhs,
         u_solution,
-        boundary_conditions
+        boundary_conditions,
     )
 
     u_solution.set_allow_extrapolation(True)
@@ -84,5 +87,41 @@ if __name__ == '__main__':
     plt.colorbar(c, fraction=0.047*1/10)
     plt.show()
 
+
+    # forbidden_pairs = [
+    #     ('bicgstab', 'icc'),
+    #     ('bicgstab', 'ilu'),
+    #     ('bicgstab', 'jacobi'),
+    #     ('cg', 'amg'),
+    #     ('cg', 'default'),
+    #     ('gmres', 'hyper_parasails'),
+    #     ('gmres', 'icc'),
+    #     ('gmres', 'ilu'),
+    #     ('gmres', 'jacobi'),
+    #     ('gmres', 'none'),
+    #     ('gmres', 'petsc_amg'),
+    # ]
+
+    # forbidden_units = [
+    #     'bicgstab', # done
+    #     'cg',
+    #     'tmfqr'
+    # ]
+
+    # for i, solver in enumerate(['bicgstab', 'cg', 'default', 'gmres', 'minres', 'mumps', 'petsc', 'richardson', 'superlu', 'superlu_dist', 'tmfqr', 'umfpack']):
+    #     for preconditioner in ['amg', 'default', 'hypre_amg', 'hypre_euclid', 'hypre_parasails', 'icc', 'ilu', 'jacobi', 'none', 'petsc_amg', 'sor']:
+    #         SOLVER_DICT = {'linear_solver': solver, 'preconditioner': preconditioner}
+    #         if solver in forbidden_units:
+    #             continue
+    #         if (solver, preconditioner) in forbidden_pairs:
+    #             continue
+    #         if i < 10:
+    #             continue
+    #         time_start = time.time()
+    #         print(SOLVER_DICT)
+    #         e = magnitude_of_E(E_from_sigma(sigma))
+    #         e = magnitude_of_E(E_from_sigma(sigma))
+    #         time_end = time.time()
+    #         print(SOLVER_DICT, (time_end - time_start) / 2)
 
 

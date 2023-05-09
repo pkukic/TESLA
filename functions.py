@@ -11,6 +11,7 @@ import poisson
 import constants
 
 parameters["reorder_dofs_serial"] = False
+parameters["form_compiler"]["cpp_optimize"] = True
 
 def G(electric_field_values):
     return constants.G_0 * np.exp(-(constants.E_A - constants.B * electric_field_values) / (constants.K_B * constants.T))
