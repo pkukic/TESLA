@@ -6,6 +6,7 @@ import utils
 
 import pickle
 import functools
+import os
 
 parameters["reorder_dofs_serial"] = False
 
@@ -63,7 +64,7 @@ T = 300
 DELTA_T = 0.1
 
 # This is some 0-dimensional magic number
-MESH_RESOLUTION = 500
+INITIAL_MESH_RESOLUTION = 150
 
 # The Lagrangian elements are of degree 2
 FS_DEGREE = 2
@@ -98,19 +99,83 @@ subdomain = ms.Polygon(submesh_vertices)
 
 @functools.lru_cache
 def mesh():
-    return ms.generate_mesh(domain, MESH_RESOLUTION)
+    m = ms.generate_mesh(domain, INITIAL_MESH_RESOLUTION)
+
+    # Define the mesh density function
+    def mesh_density(x):
+        if x[0] >= 10 and x[0] <= 40:
+            return True
+        else:
+            return False
+
+    # Define the mesh function
+    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    mf.set_all(False)
+    for cell in fe.cells(m):
+        if mesh_density(cell.midpoint()):
+            mf[cell] = True
+
+    m = fe.refine(m, mf)
+
+    def mesh_density(x):
+        if x[0] >= 20 and x[0] <= 30:
+            return True
+        else:
+            return False
+
+    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    mf.set_all(False)
+    for cell in fe.cells(m):
+        if mesh_density(cell.midpoint()):
+            mf[cell] = True
+
+    m = fe.refine(m, mf)
+
+    return m
 
 @functools.lru_cache
 def mesh_sub():
-    return ms.generate_mesh(subdomain, MESH_RESOLUTION)    
+    m = ms.generate_mesh(subdomain, INITIAL_MESH_RESOLUTION)
+
+    # Define the mesh density function
+    def mesh_density(x):
+        if x[0] >= 10 and x[0] <= 40:
+            return True
+        else:
+            return False
+
+    # Define the mesh function
+    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    mf.set_all(False)
+    for cell in fe.cells(m):
+        if mesh_density(cell.midpoint()):
+            mf[cell] = True
+
+    m = fe.refine(m, mf)
+
+    def mesh_density(x):
+        if x[0] >= 20 and x[0] <= 30:
+            return True
+        else:
+            return False
+
+    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    mf.set_all(False)
+    for cell in fe.cells(m):
+        if mesh_density(cell.midpoint()):
+            mf[cell] = True
+
+    m = fe.refine(m, mf)
+
+    return m   
 
 @functools.lru_cache
 def mesh_avg_areas():
-    try:
+    if os.path.exists('mesh_avg_areas.pickle'):
         with open('mesh_avg_areas.pickle', 'rb') as f:
             mesh_avg_areas = pickle.load(f)
         return mesh_avg_areas
-    except BaseException:
+    else:
         mesh_avg_areas = utils.areas_from_mesh(mesh())
         with open('mesh_avg_areas.pickle', 'wb+') as f:
             pickle.dump(mesh_avg_areas, f, pickle.HIGHEST_PROTOCOL)
@@ -118,11 +183,11 @@ def mesh_avg_areas():
 
 @functools.lru_cache
 def mesh_sub_avg_areas():
-    try:
+    if os.path.exists('mesh_sub_avg_areas.pickle'):
         with open('mesh_sub_avg_areas.pickle', 'rb') as f:
             mesh_sub_avg_areas = pickle.load(f)
         return mesh_sub_avg_areas
-    except BaseException:
+    else:
         mesh_sub_avg_areas = utils.areas_from_mesh(mesh_sub())
         with open('mesh_sub_avg_areas.pickle', 'wb+') as f:
             pickle.dump(mesh_sub_avg_areas, f, pickle.HIGHEST_PROTOCOL)
