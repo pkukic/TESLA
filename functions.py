@@ -109,18 +109,15 @@ if __name__ == '__main__':
 
     print('Computed.')
 
-    c = plot(new_sigma, cmap='inferno')
-    plt.gca().set_aspect('equal')
-    plt.colorbar(c, fraction=0.047*1/10)
-    plt.show()
+    i = I(new_sigma, e_vect)
+    print(i)
+
 
     c = plot(e, cmap='inferno')
     plt.gca().set_aspect('equal')
     plt.colorbar(c, fraction=0.047*1/10)
     plt.show()
     
-    i = I(new_sigma, e_vect)
-    print(i)
 
     c = plot(new_sigma, cmap='inferno')
     plt.gca().set_aspect('equal')
