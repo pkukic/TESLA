@@ -40,7 +40,7 @@ def new_sigma_from_pc(pc_values, coords, old_sigma_values):
 
 
 def sigma_f_from_vals(sigma_vals):
-    new_sigma_function = fe.Function(constants.lagrange_function_sub_space_second_order())
+    new_sigma_function = fe.Function(constants.lagrange_function_sub_space())
     new_sigma_function.vector().set_local(sigma_vals)
     new_sigma_function.set_allow_extrapolation(True)
 
@@ -54,12 +54,12 @@ def sigma_f_from_vals(sigma_vals):
 
     # f = fe.project(
     #     f1,
-    #     constants.lagrange_function_space_second_order()
+    #     constants.lagrange_function_space()
     # )W
     # condition = fe.lt(f, fe.Constant(constants.WIDTH/2))
 
-    # new_sigma_wider = fe.Function(constants.lagrange_function_space_second_order())
-    # new_sigma_wider = fe.project(new_sigma_function, constants.lagrange_function_space_second_order())
+    # new_sigma_wider = fe.Function(constants.lagrange_function_space())
+    # new_sigma_wider = fe.project(new_sigma_function, constants.lagrange_function_space())
     # new_sigma_wider = fe.conditional(
     #     condition, 
     #     new_sigma_function, 
@@ -80,9 +80,9 @@ def sigma_f_from_vals(sigma_vals):
         def value_shape(self):
             return ()
 
-    # new_sigma_wider = fe.Function(constants.lagrange_function_space_second_order())
-    new_sigma_wider = fe.Function(constants.lagrange_function_space_second_order(), mesh=constants.mesh())
-    new_sigma_wider.assign(fe.project(v=SigmaExpr(), V=constants.lagrange_function_space_second_order(), mesh=constants.mesh()))
+    # new_sigma_wider = fe.Function(constants.lagrange_function_space())
+    new_sigma_wider = fe.Function(constants.lagrange_function_space(), mesh=constants.mesh())
+    new_sigma_wider.assign(fe.project(v=SigmaExpr(), V=constants.lagrange_function_spacetants.mesh()))
     new_sigma_wider.set_allow_extrapolation(True)
     # print(new_sigma_wider(50, 10))
     # print(new_sigma_wider(350, 25))
@@ -97,8 +97,8 @@ def sigma_f_from_vals(sigma_vals):
 
 
 def I(sigma, e_vect):
-    sigma_sub = fe.Function(constants.lagrange_function_sub_space_second_order())
-    sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space_second_order()))
+    sigma_sub = fe.Function(constants.lagrange_function_sub_space())
+    sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space()))
 
     boundaries = fe.MeshFunction("size_t", constants.mesh_sub(), constants.mesh_sub().topology().dim()-1)
     default_boundary_marker = 0
@@ -131,8 +131,8 @@ if __name__ == '__main__':
 
     print('Computing G, P_c and sigma...')
 
-    sigma_sub = fe.Function(constants.lagrange_function_sub_space_second_order())
-    sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space_second_order()))
+    sigma_sub = fe.Function(constants.lagrange_function_sub_space())
+    sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space()))
     sigma_sub_values = sigma_sub.compute_vertex_values()
 
     coords = constants.mesh_sub().coordinates()

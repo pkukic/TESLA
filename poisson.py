@@ -26,13 +26,13 @@ def E_from_sigma(sigma, top_potential):
         return on_boundary and not left_bottom_right_boundary(x, on_boundary)
     
     homogenous_left_bottom_right_BC = fe.DirichletBC(
-        constants.lagrange_function_space_second_order(),
+        constants.lagrange_function_space(),
         fe.Constant(constants.BOTTOM_POTENTIAL),
         left_bottom_right_boundary
     )
 
     homogenous_top_BC = fe.DirichletBC(
-        constants.lagrange_function_space_second_order(),
+        constants.lagrange_function_space(),
         fe.Constant(top_potential),
         top_boundary
     )
@@ -40,8 +40,8 @@ def E_from_sigma(sigma, top_potential):
     boundary_conditions = [homogenous_left_bottom_right_BC, homogenous_top_BC]
 
     # Trial and test functions
-    u_trial = fe.TrialFunction(constants.lagrange_function_space_second_order())
-    v_test = fe.TestFunction(constants.lagrange_function_space_second_order())
+    u_trial = fe.TrialFunction(constants.lagrange_function_space())
+    v_test = fe.TestFunction(constants.lagrange_function_space())
 
     # Weak form
     
@@ -56,7 +56,7 @@ def E_from_sigma(sigma, top_potential):
     weak_form_rhs = fe.Constant(0.0) * v_test * fe.dx
 
     # Solution
-    u_solution = fe.Function(constants.lagrange_function_space_second_order())
+    u_solution = fe.Function(constants.lagrange_function_space())
     fe.solve(
         weak_form_lhs == weak_form_rhs,
         u_solution,
@@ -66,15 +66,15 @@ def E_from_sigma(sigma, top_potential):
     u_solution.set_allow_extrapolation(True)
 
     # Restrict solution to submesh
-    u_sub = fe.Function(constants.lagrange_function_sub_space_second_order())
-    u_sub.assign(fe.interpolate(u_solution, constants.lagrange_function_sub_space_second_order()))
+    u_sub = fe.Function(constants.lagrange_function_sub_space())
+    u_sub.assign(fe.interpolate(u_solution, constants.lagrange_function_sub_space()))
     u_sub.set_allow_extrapolation(True)
 
-    grad_u_sub = fe.project(fe.grad(u_sub), constants.lagrange_vector_sub_space_second_order())
+    grad_u_sub = fe.project(fe.grad(u_sub), constants.lagrange_vector_sub_space())
     return grad_u_sub
 
 def magnitude_of_E(e_vect):
-    magnitude_e_vect = fe.project(fe.sqrt(fe.dot(e_vect, e_vect)), constants.lagrange_function_sub_space_second_order())
+    magnitude_e_vect = fe.project(fe.sqrt(fe.dot(e_vect, e_vect)), constants.lagrange_function_sub_space())
     return magnitude_e_vect
 
 if __name__ == '__main__':

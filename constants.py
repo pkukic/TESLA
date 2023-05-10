@@ -206,7 +206,7 @@ def mesh_sub_avg_areas():
         return mesh_sub_avg_areas
 
 @functools.lru_cache
-def lagrange_function_space_second_order():
+def lagrange_function_space():
     return fe.FunctionSpace(
             mesh(),
             'CG',
@@ -214,7 +214,7 @@ def lagrange_function_space_second_order():
     )
 
 @functools.lru_cache
-def lagrange_function_sub_space_second_order():
+def lagrange_function_sub_space():
     return fe.FunctionSpace(
         mesh_sub(),
         'CG', 
@@ -222,7 +222,7 @@ def lagrange_function_sub_space_second_order():
     )
 
 @functools.lru_cache
-def lagrange_vector_sub_space_second_order():
+def lagrange_vector_sub_space():
     return fe.VectorFunctionSpace(
             mesh_sub(), 
             'CG', 

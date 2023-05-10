@@ -24,8 +24,8 @@ if __name__ == '__main__':
         e_vect = poisson.E_from_sigma(sigma, top_potential)
         e = poisson.magnitude_of_E(e_vect)
 
-        sigma_sub = fe.Function(constants.lagrange_function_sub_space_second_order())
-        sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space_second_order()))
+        sigma_sub = fe.Function(constants.lagrange_function_sub_space())
+        sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space()))
 
         c = plot(sigma_sub, cmap='inferno')
         plt.gca().set_aspect('equal')
