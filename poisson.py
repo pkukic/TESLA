@@ -13,7 +13,7 @@ import constants
 parameters["reorder_dofs_serial"] = False
 parameters["form_compiler"]["cpp_optimize"] = True
 
-def E_from_sigma(sigma):
+def E_from_sigma(sigma, top_potential):
     # Boundary conditions
     def left_bottom_right_boundary(x, on_boundary):
         return on_boundary and (
@@ -33,7 +33,7 @@ def E_from_sigma(sigma):
 
     homogenous_top_BC = fe.DirichletBC(
         constants.lagrange_function_space_second_order(),
-        fe.Constant(constants.TOP_POTENTIAL),
+        fe.Constant(top_potential),
         top_boundary
     )
 
@@ -79,8 +79,9 @@ def magnitude_of_E(e_vect):
 
 if __name__ == '__main__':
     sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=constants.SIGMA_HRS, domain=constants.mesh())
+    top_potential = 1.0
 
-    e = magnitude_of_E(E_from_sigma(sigma))
+    e = magnitude_of_E(E_from_sigma(sigma, top_potential))
 
     c = plot(e, cmap='inferno')
     plt.gca().set_aspect('equal')

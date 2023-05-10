@@ -14,10 +14,13 @@ parameters["reorder_dofs_serial"] = False
 parameters["form_compiler"]["cpp_optimize"] = True
 
 def G(electric_field_values):
+    electric_field_values = np.array(electric_field_values, np.float128)
     return constants.G_0 * np.exp(-(constants.E_A - constants.B * electric_field_values) / (constants.K_B * constants.T))
 
 
 def P_c(g_values, avg_areas):
+    g_values = np.array(g_values, np.float128)
+    avg_areas = np.array(avg_areas, np.float128)
     return 1 - np.exp(- g_values * avg_areas * constants.A_F * constants.DELTA_T)
 
 
@@ -66,15 +69,16 @@ def I(sigma, e_vect):
 
     n = fe.FacetNormal(constants.mesh_sub())
 
-    return constants.A_F * fe.assemble(sigma * fe.dot(-e_vect, n) * ds)
+    return constants.A_F * abs(fe.assemble(sigma * fe.dot(e_vect, n) * ds))
 
 
 if __name__ == '__main__':
     sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=constants.SIGMA_HRS, domain=constants.mesh())
+    top_potential = 1.0
 
     print('Solving Poisson equation...')
 
-    e_vect = poisson.E_from_sigma(sigma)
+    e_vect = poisson.E_from_sigma(sigma, top_potential)
     e = poisson.magnitude_of_E(e_vect)
 
     print('Poisson equation solved.')

@@ -20,7 +20,7 @@ X_BOTTOM_LEFT, Y_BOTTOM_LEFT = (0.0, 0.0)
 X_TOP_RIGHT, Y_TOP_RIGHT = (WIDTH, HEIGHT)
 
 # The potentials are in volts
-TOP_POTENTIAL = 1.0
+INITIAL_TOP_POTENTIAL = 0.0
 BOTTOM_POTENTIAL = 0.0
 
 # Electrical conductivity of oxide
@@ -57,14 +57,26 @@ K_B = 8.617 * 1e-5
 
 # The temperature
 # In kelvin
-T = 300
+T = 300.0
 
 # Time simulation step
 # In seconds
-DELTA_T = 0.1
+DELTA_T = 0.0001
+
+# Initial time
+# In seconds
+INITIAL_TIME = 0.0
+
+# Compliance current
+# In amperes
+I_CC = 1 * 1e-9
+
+# Voltage ramp-up rate
+# In volts
+VR = 1.0
 
 # This is some 0-dimensional magic number
-INITIAL_MESH_RESOLUTION = 150
+INITIAL_MESH_RESOLUTION = 300
 
 # The Lagrangian elements are of degree 2
 FS_DEGREE = 2
