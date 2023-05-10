@@ -82,7 +82,7 @@ def sigma_f_from_vals(sigma_vals):
 
     # new_sigma_wider = fe.Function(constants.lagrange_function_space())
     new_sigma_wider = fe.Function(constants.lagrange_function_space(), mesh=constants.mesh())
-    new_sigma_wider.assign(fe.project(v=SigmaExpr(), V=constants.lagrange_function_spacetants.mesh()))
+    new_sigma_wider.assign(fe.project(v=SigmaExpr(), V=constants.lagrange_function_space()))
     new_sigma_wider.set_allow_extrapolation(True)
     # print(new_sigma_wider(50, 10))
     # print(new_sigma_wider(350, 25))

@@ -25,11 +25,11 @@ BOTTOM_POTENTIAL = 0.0
 
 # Electrical conductivity of oxide
 # In sieverts/angstrom
-SIGMA_HRS = 3.0 * 1e-14
+SIGMA_HRS = 3.0 * 1e-13
 
 # Electrical conductivity of defect
 # In sieverts/angstrom
-SIGMA_LRS = 3.5 * 1e-5
+SIGMA_LRS = 3.5 * 1e-6
 
 # Pre-exponential factor
 # 1 / (seconds * angstrom**3)
@@ -61,7 +61,7 @@ T = 300.0
 
 # Time simulation step
 # In seconds
-DELTA_T = 1e-3
+DELTA_T = 1e-2
 
 # Initial time
 # In seconds
@@ -69,7 +69,7 @@ INITIAL_TIME = 0.0
 
 # Compliance current
 # In amperes
-I_CC = 1 * 1e-3
+I_CC = 1 * 1e-4
 
 # Voltage ramp-up rate
 # In volts / second
