@@ -1,5 +1,5 @@
 import fenics as fe
-from dolfin import plot, parameters, vertex_to_dof_map, dof_to_vertex_map
+from dolfin import plot, parameters
 
 import matplotlib
 matplotlib.use('Qt5Agg')

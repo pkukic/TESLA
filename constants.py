@@ -9,6 +9,7 @@ import functools
 import os
 
 parameters["reorder_dofs_serial"] = False
+parameters["form_compiler"]["cpp_optimize"] = True
 
 # All lengths are in angstroms
 DISCARDED_WIDTH_EACH_SIDE = 100.0
