@@ -26,6 +26,12 @@ if __name__ == '__main__':
 
         sigma_sub = fe.Function(constants.lagrange_function_sub_space_second_order())
         sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space_second_order()))
+
+        c = plot(sigma_sub, cmap='inferno')
+        plt.gca().set_aspect('equal')
+        plt.colorbar(c, fraction=0.047*1/10)
+        plt.show()
+
         sigma_sub_values = np.abs(sigma_sub.compute_vertex_values())
 
         coords = constants.mesh_sub().coordinates()
@@ -33,7 +39,13 @@ if __name__ == '__main__':
         g_values = functions.G(e_values)
         pc_values = functions.P_c(g_values, constants.mesh_sub_avg_areas())
         new_sigma_values = np.abs(functions.new_sigma_from_pc(pc_values, coords, sigma_sub_values))
+
         new_sigma = functions.sigma_f_from_vals(new_sigma_values)
+
+        c = plot(new_sigma, cmap='inferno')
+        plt.gca().set_aspect('equal')
+        plt.colorbar(c, fraction=0.047*1/10)
+        plt.show()
 
         # c = plot(e, cmap='inferno')
         # plt.gca().set_aspect('equal')
