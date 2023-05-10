@@ -1,5 +1,5 @@
 import fenics as fe
-from dolfin import plot, parameters
+from dolfin import plot, parameters, vertex_to_dof_map, dof_to_vertex_map
 
 import matplotlib
 matplotlib.use('Qt5Agg')
@@ -44,8 +44,39 @@ def sigma_f_from_vals(sigma_vals):
     new_sigma_function.vector().set_local(sigma_vals)
     new_sigma_function.set_allow_extrapolation(True)
 
+    print('Plotting new_sigma')
+    c = plot(new_sigma_function, cmap='inferno')
+    plt.gca().set_aspect('equal')
+    plt.colorbar(c, fraction=0.047*1/10)
+    plt.show()
+
+    # f1 = fe.Expression("abs(x[0] - midline)", midline=constants.WIDTH/2, degree=1)
+
+    # f = fe.project(
+    #     f1,
+    #     constants.lagrange_function_space_second_order()
+    # )
+    # condition = fe.lt(f, fe.Constant(constants.WIDTH/2))
+
+    # new_sigma_wider = fe.Function(constants.lagrange_function_space_second_order())
+    # new_sigma_wider = fe.project(new_sigma_function, constants.lagrange_function_space_second_order())
+    # new_sigma_wider = fe.conditional(
+    #     condition, 
+    #     new_sigma_function, 
+    #     fe.Constant(constants.SIGMA_HRS)
+    # )
+
     new_sigma_wider = fe.Function(constants.lagrange_function_space_second_order())
-    new_sigma_wider.assign(fe.project(new_sigma_function, constants.lagrange_function_space_second_order()))
+    new_sigma_wider.vector()[:] = constants.SIGMA_HRS
+    ind = dof_to_vertex_map()
+    new_sigma_wider.vector()[ind] = sigma_vals
+    new_sigma_wider.set_allow_extrapolation(True)
+
+    print('Plotting new_sigma_wider')
+    c = plot(new_sigma_wider, cmap='inferno')
+    plt.gca().set_aspect('equal')
+    plt.colorbar(c, fraction=0.047*1/10)
+    plt.show()
 
     return new_sigma_wider
 

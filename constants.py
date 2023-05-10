@@ -76,7 +76,7 @@ I_CC = 1 * 1e-9
 VR = 1.0
 
 # This is some 0-dimensional magic number
-INITIAL_MESH_RESOLUTION = 300
+INITIAL_MESH_RESOLUTION = 500
 
 # The Lagrangian elements are of degree 2
 FS_DEGREE = 2
@@ -113,35 +113,35 @@ subdomain = ms.Polygon(submesh_vertices)
 def mesh():
     m = ms.generate_mesh(domain, INITIAL_MESH_RESOLUTION)
 
-    # Define the mesh density function
-    def mesh_density(x):
-        if x[0] >= 10 and x[0] <= 40:
-            return True
-        else:
-            return False
+    # # Define the mesh density function
+    # def mesh_density(x):
+    #     if x[0] >= 10 and x[0] <= 40:
+    #         return True
+    #     else:
+    #         return False
 
-    # Define the mesh function
-    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
-    mf.set_all(False)
-    for cell in fe.cells(m):
-        if mesh_density(cell.midpoint()):
-            mf[cell] = True
+    # # Define the mesh function
+    # mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    # mf.set_all(False)
+    # for cell in fe.cells(m):
+    #     if mesh_density(cell.midpoint()):
+    #         mf[cell] = True
 
-    m = fe.refine(m, mf)
+    # m = fe.refine(m, mf)
 
-    def mesh_density(x):
-        if x[0] >= 20 and x[0] <= 30:
-            return True
-        else:
-            return False
+    # def mesh_density(x):
+    #     if x[0] >= 20 and x[0] <= 30:
+    #         return True
+    #     else:
+    #         return False
 
-    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
-    mf.set_all(False)
-    for cell in fe.cells(m):
-        if mesh_density(cell.midpoint()):
-            mf[cell] = True
+    # mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    # mf.set_all(False)
+    # for cell in fe.cells(m):
+    #     if mesh_density(cell.midpoint()):
+    #         mf[cell] = True
 
-    m = fe.refine(m, mf)
+    # m = fe.refine(m, mf)
 
     return m
 
@@ -149,35 +149,35 @@ def mesh():
 def mesh_sub():
     m = ms.generate_mesh(subdomain, INITIAL_MESH_RESOLUTION)
 
-    # Define the mesh density function
-    def mesh_density(x):
-        if x[0] >= 10 and x[0] <= 40:
-            return True
-        else:
-            return False
+    # # Define the mesh density function
+    # def mesh_density(x):
+    #     if x[0] >= 10 and x[0] <= 40:
+    #         return True
+    #     else:
+    #         return False
 
-    # Define the mesh function
-    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
-    mf.set_all(False)
-    for cell in fe.cells(m):
-        if mesh_density(cell.midpoint()):
-            mf[cell] = True
+    # # Define the mesh function
+    # mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    # mf.set_all(False)
+    # for cell in fe.cells(m):
+    #     if mesh_density(cell.midpoint()):
+    #         mf[cell] = True
 
-    m = fe.refine(m, mf)
+    # m = fe.refine(m, mf)
 
-    def mesh_density(x):
-        if x[0] >= 20 and x[0] <= 30:
-            return True
-        else:
-            return False
+    # def mesh_density(x):
+    #     if x[0] >= 20 and x[0] <= 30:
+    #         return True
+    #     else:
+    #         return False
 
-    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
-    mf.set_all(False)
-    for cell in fe.cells(m):
-        if mesh_density(cell.midpoint()):
-            mf[cell] = True
+    # mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    # mf.set_all(False)
+    # for cell in fe.cells(m):
+    #     if mesh_density(cell.midpoint()):
+    #         mf[cell] = True
 
-    m = fe.refine(m, mf)
+    # m = fe.refine(m, mf)
 
     return m   
 
