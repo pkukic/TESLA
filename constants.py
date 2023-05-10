@@ -25,11 +25,11 @@ BOTTOM_POTENTIAL = 0.0
 
 # Electrical conductivity of oxide
 # In sieverts/angstrom
-SIGMA_HRS = 3.0 * 1e-13
+SIGMA_HRS = 3.0 * 1e-14
 
 # Electrical conductivity of defect
 # In sieverts/angstrom
-SIGMA_LRS = 3.5 * 1e-6
+SIGMA_LRS = 3.5 * 1e-5
 
 # Pre-exponential factor
 # 1 / (seconds * angstrom**3)
@@ -61,7 +61,7 @@ T = 300.0
 
 # Time simulation step
 # In seconds
-DELTA_T = 0.0001
+DELTA_T = 1e-3
 
 # Initial time
 # In seconds
@@ -69,17 +69,17 @@ INITIAL_TIME = 0.0
 
 # Compliance current
 # In amperes
-I_CC = 1 * 1e-9
+I_CC = 1 * 1e-3
 
 # Voltage ramp-up rate
-# In volts
+# In volts / second
 VR = 1.0
 
 # This is some 0-dimensional magic number
-INITIAL_MESH_RESOLUTION = 500
+INITIAL_MESH_RESOLUTION = 200
 
 # The Lagrangian elements are of degree 2
-FS_DEGREE = 2
+FS_DEGREE = 3
 
 domain_vertices = [
     Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT),
@@ -113,35 +113,35 @@ subdomain = ms.Polygon(submesh_vertices)
 def mesh():
     m = ms.generate_mesh(domain, INITIAL_MESH_RESOLUTION)
 
-    # # Define the mesh density function
-    # def mesh_density(x):
-    #     if x[0] >= 10 and x[0] <= 40:
-    #         return True
-    #     else:
-    #         return False
+    # Define the mesh density function
+    def mesh_density(x):
+        if x[0] >= 10 and x[0] <= 40:
+            return True
+        else:
+            return False
 
-    # # Define the mesh function
-    # mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
-    # mf.set_all(False)
-    # for cell in fe.cells(m):
-    #     if mesh_density(cell.midpoint()):
-    #         mf[cell] = True
+    # Define the mesh function
+    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    mf.set_all(False)
+    for cell in fe.cells(m):
+        if mesh_density(cell.midpoint()):
+            mf[cell] = True
 
-    # m = fe.refine(m, mf)
+    m = fe.refine(m, mf)
 
-    # def mesh_density(x):
-    #     if x[0] >= 20 and x[0] <= 30:
-    #         return True
-    #     else:
-    #         return False
+    def mesh_density(x):
+        if x[0] >= 20 and x[0] <= 30:
+            return True
+        else:
+            return False
 
-    # mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
-    # mf.set_all(False)
-    # for cell in fe.cells(m):
-    #     if mesh_density(cell.midpoint()):
-    #         mf[cell] = True
+    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    mf.set_all(False)
+    for cell in fe.cells(m):
+        if mesh_density(cell.midpoint()):
+            mf[cell] = True
 
-    # m = fe.refine(m, mf)
+    m = fe.refine(m, mf)
 
     return m
 
@@ -149,35 +149,35 @@ def mesh():
 def mesh_sub():
     m = ms.generate_mesh(subdomain, INITIAL_MESH_RESOLUTION)
 
-    # # Define the mesh density function
-    # def mesh_density(x):
-    #     if x[0] >= 10 and x[0] <= 40:
-    #         return True
-    #     else:
-    #         return False
+    # Define the mesh density function
+    def mesh_density(x):
+        if x[0] >= 10 and x[0] <= 40:
+            return True
+        else:
+            return False
 
-    # # Define the mesh function
-    # mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
-    # mf.set_all(False)
-    # for cell in fe.cells(m):
-    #     if mesh_density(cell.midpoint()):
-    #         mf[cell] = True
+    # Define the mesh function
+    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    mf.set_all(False)
+    for cell in fe.cells(m):
+        if mesh_density(cell.midpoint()):
+            mf[cell] = True
 
-    # m = fe.refine(m, mf)
+    m = fe.refine(m, mf)
 
-    # def mesh_density(x):
-    #     if x[0] >= 20 and x[0] <= 30:
-    #         return True
-    #     else:
-    #         return False
+    def mesh_density(x):
+        if x[0] >= 20 and x[0] <= 30:
+            return True
+        else:
+            return False
 
-    # mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
-    # mf.set_all(False)
-    # for cell in fe.cells(m):
-    #     if mesh_density(cell.midpoint()):
-    #         mf[cell] = True
+    mf = fe.MeshFunction(value_type="bool", mesh=m, dim=2)
+    mf.set_all(False)
+    for cell in fe.cells(m):
+        if mesh_density(cell.midpoint()):
+            mf[cell] = True
 
-    # m = fe.refine(m, mf)
+    m = fe.refine(m, mf)
 
     return m   
 

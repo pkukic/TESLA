@@ -44,18 +44,18 @@ def sigma_f_from_vals(sigma_vals):
     new_sigma_function.vector().set_local(sigma_vals)
     new_sigma_function.set_allow_extrapolation(True)
 
-    print('Plotting new_sigma')
-    c = plot(new_sigma_function, cmap='inferno')
-    plt.gca().set_aspect('equal')
-    plt.colorbar(c, fraction=0.047*1/10)
-    plt.show()
+    # print('Plotting new_sigma')
+    # c = plot(new_sigma_function, cmap='inferno')
+    # plt.gca().set_aspect('equal')
+    # plt.colorbar(c, fraction=0.047*1/10)
+    # plt.show()
 
     # f1 = fe.Expression("abs(x[0] - midline)", midline=constants.WIDTH/2, degree=1)
 
     # f = fe.project(
     #     f1,
     #     constants.lagrange_function_space_second_order()
-    # )
+    # )W
     # condition = fe.lt(f, fe.Constant(constants.WIDTH/2))
 
     # new_sigma_wider = fe.Function(constants.lagrange_function_space_second_order())
@@ -65,18 +65,33 @@ def sigma_f_from_vals(sigma_vals):
     #     new_sigma_function, 
     #     fe.Constant(constants.SIGMA_HRS)
     # )
+    
+    class SigmaExpr(fe.UserExpression):
+        def __init__(self, *args, **kwargs):
+            super().__init__(**kwargs)
+            
+        def eval(self, values, x):
+            if x[0] >= constants.DISCARDED_WIDTH_EACH_SIDE and x[0] <= constants.WIDTH - constants.DISCARDED_WIDTH_EACH_SIDE:
+                values[0] = abs(new_sigma_function(x[0], x[1]))
+            else:
+                values[0] = constants.SIGMA_HRS
+            return
 
-    new_sigma_wider = fe.Function(constants.lagrange_function_space_second_order())
-    new_sigma_wider.vector()[:] = constants.SIGMA_HRS
-    ind = dof_to_vertex_map()
-    new_sigma_wider.vector()[ind] = sigma_vals
+        def value_shape(self):
+            return ()
+
+    # new_sigma_wider = fe.Function(constants.lagrange_function_space_second_order())
+    new_sigma_wider = fe.Function(constants.lagrange_function_space_second_order(), mesh=constants.mesh())
+    new_sigma_wider.assign(fe.project(v=SigmaExpr(), V=constants.lagrange_function_space_second_order(), mesh=constants.mesh()))
     new_sigma_wider.set_allow_extrapolation(True)
+    # print(new_sigma_wider(50, 10))
+    # print(new_sigma_wider(350, 25))
 
-    print('Plotting new_sigma_wider')
-    c = plot(new_sigma_wider, cmap='inferno')
-    plt.gca().set_aspect('equal')
-    plt.colorbar(c, fraction=0.047*1/10)
-    plt.show()
+    # print('Plotting new_sigma_wider')
+    # c = plot(new_sigma_wider, cmap='inferno')
+    # plt.gca().set_aspect('equal')
+    # plt.colorbar(c, fraction=0.047*1/10)
+    # plt.show()
 
     return new_sigma_wider
 

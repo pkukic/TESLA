@@ -26,24 +26,24 @@ if __name__ == '__main__':
 
         sigma_sub = fe.Function(constants.lagrange_function_sub_space_second_order())
         sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space_second_order()))
-        sigma_sub_values = sigma_sub.compute_vertex_values()
+        sigma_sub_values = np.abs(sigma_sub.compute_vertex_values())
 
         coords = constants.mesh_sub().coordinates()
         e_values = e.compute_vertex_values()
         g_values = functions.G(e_values)
         pc_values = functions.P_c(g_values, constants.mesh_sub_avg_areas())
-        new_sigma_values = functions.new_sigma_from_pc(pc_values, coords, sigma_sub_values)
+        new_sigma_values = np.abs(functions.new_sigma_from_pc(pc_values, coords, sigma_sub_values))
         new_sigma = functions.sigma_f_from_vals(new_sigma_values)
 
-        c = plot(e, cmap='inferno')
-        plt.gca().set_aspect('equal')
-        plt.colorbar(c, fraction=0.047*1/10)
-        plt.show()
+        # c = plot(e, cmap='inferno')
+        # plt.gca().set_aspect('equal')
+        # plt.colorbar(c, fraction=0.047*1/10)
+        # plt.show()
         
-        c = plot(new_sigma, cmap='inferno')
-        plt.gca().set_aspect('equal')
-        plt.colorbar(c, fraction=0.047*1/10)
-        plt.show()
+        # c = plot(new_sigma, cmap='inferno')
+        # plt.gca().set_aspect('equal')
+        # plt.colorbar(c, fraction=0.047*1/10)
+        # plt.show()
 
         current = functions.I(new_sigma, e_vect)
         print(f'Current at iteration: {current}')
@@ -51,6 +51,16 @@ if __name__ == '__main__':
         time += constants.DELTA_T
         top_potential += constants.DELTA_T * constants.VR
         sigma = new_sigma
+
+    c = plot(e, cmap='inferno')
+    plt.gca().set_aspect('equal')
+    plt.colorbar(c, fraction=0.047*1/10)
+    plt.show()
+    
+    c = plot(new_sigma, cmap='inferno')
+    plt.gca().set_aspect('equal')
+    plt.colorbar(c, fraction=0.047*1/10)
+    plt.show()
 
     print(f'Final current: {current}')
     print(f'Final potential: {top_potential}')
