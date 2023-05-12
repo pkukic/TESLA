@@ -23,12 +23,15 @@ def areas_from_mesh(mesh):
             vertex_to_cell[vertex].append(cell.index())
 
     # Compute the average area for each vertex
-    avg_areas = np.zeros(mesh.num_vertices())
-    for vertex in range(mesh.num_vertices()):
+    nv = mesh.num_vertices()
+    avg_areas = np.zeros(nv)
+    coords = mesh.coordinates()
+    cells = mesh.cells()
+    for vertex in range(nv):
         # Get the cell indices adjacent to this vertex
         cell_indices = np.array(vertex_to_cell[vertex])
         # Get the coordinates of the vertices of the adjacent triangles
-        triangle_vertices = mesh.coordinates()[mesh.cells()[cell_indices], :]
+        triangle_vertices = coords[cells[cell_indices], :]
         # Compute areas
         areas = triangle_area_arr(triangle_vertices)
         # Compute the average area of all adjacent triangles
