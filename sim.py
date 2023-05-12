@@ -14,7 +14,7 @@ import functions
 parameters["reorder_dofs_serial"] = False
 parameters["form_compiler"]["cpp_optimize"] = True
 
-if __name__ == '__main__':
+def single_sim():
     sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=constants.SIGMA_HRS, domain=constants.mesh())
     top_potential = constants.INITIAL_TOP_POTENTIAL
     time = constants.INITIAL_TIME
@@ -27,10 +27,10 @@ if __name__ == '__main__':
         sigma_sub = fe.Function(constants.lagrange_function_sub_space())
         sigma_sub.assign(fe.interpolate(sigma, constants.lagrange_function_sub_space()))
 
-        c = plot(sigma_sub, cmap='inferno')
-        plt.gca().set_aspect('equal')
-        plt.colorbar(c, fraction=0.047*1/10)
-        plt.show()
+        # c = plot(sigma_sub, cmap='inferno')
+        # plt.gca().set_aspect('equal')
+        # plt.colorbar(c, fraction=0.047*1/10)
+        # plt.show()
 
         sigma_sub_values = np.abs(sigma_sub.compute_vertex_values())
 
@@ -42,10 +42,10 @@ if __name__ == '__main__':
 
         new_sigma = functions.sigma_f_from_vals(new_sigma_values)
 
-        c = plot(new_sigma, cmap='inferno')
-        plt.gca().set_aspect('equal')
-        plt.colorbar(c, fraction=0.047*1/10)
-        plt.show()
+        # c = plot(new_sigma, cmap='inferno')
+        # plt.gca().set_aspect('equal')
+        # plt.colorbar(c, fraction=0.047*1/10)
+        # plt.show()
 
         # c = plot(e, cmap='inferno')
         # plt.gca().set_aspect('equal')
@@ -58,23 +58,36 @@ if __name__ == '__main__':
         # plt.show()
 
         current = functions.I(new_sigma, e_vect)
-        print(f'Current at iteration: {current}')
+        # print(f'Current at iteration: {current}')
 
         time += constants.DELTA_T
         top_potential += constants.DELTA_T * constants.VR
         sigma = new_sigma
 
-    c = plot(e, cmap='inferno')
-    plt.gca().set_aspect('equal')
-    plt.colorbar(c, fraction=0.047*1/10)
-    plt.show()
+    return top_potential
+
+    # c = plot(e, cmap='inferno')
+    # plt.gca().set_aspect('equal')
+    # plt.colorbar(c, fraction=0.047*1/10)
+    # plt.show()
     
-    c = plot(new_sigma, cmap='inferno')
-    plt.gca().set_aspect('equal')
-    plt.colorbar(c, fraction=0.047*1/10)
-    plt.show()
+    # c = plot(new_sigma, cmap='inferno')
+    # plt.gca().set_aspect('equal')
+    # plt.colorbar(c, fraction=0.047*1/10)
+    # plt.show()
 
-    print(f'Final current: {current}')
-    print(f'Final potential: {top_potential}')
+    # print(f'Final current: {current}')
+    # print(f'Final potential: {top_potential}')
 
+def n_sims(n):
+    potentials = []
+    for i in range(n):
+        print(f"Iteration {i}")
+        p = single_sim()
+        potentials.append(p)
+    parr = np.array(potentials)
+    return np.var(parr) / np.mean(parr)
 
+if __name__ == '__main__':
+    err = n_sims(20)
+    print(err)
