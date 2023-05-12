@@ -1,18 +1,14 @@
 from dolfin import parameters, Point
-
 import fenics as fe
 import mshr as ms
 
-import pickle
 import functools
-import os
 
+from constants import *
 import utils
 
 parameters["reorder_dofs_serial"] = False
 parameters["form_compiler"]["cpp_optimize"] = True
-
-from constants import *
 
 
 @functools.lru_cache
