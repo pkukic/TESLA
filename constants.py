@@ -84,4 +84,8 @@ N_POLY_TUNE = 11
 N_HEIGHTS = 11
 
 # Number of simulations run to establish the goodness of a unit
-N_SIMS_PER_UNIT = 10
+N_SIMS_PER_UNIT = 8
+
+### Note: given that on my laptop, the speed of one evaluate() is about
+### one minute, one epoch = POPSIZE * N_SIMS_PER_UNIT * 1 minute/unit
+### should be equal to 1 hour

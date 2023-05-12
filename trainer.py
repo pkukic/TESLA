@@ -148,7 +148,11 @@ class Trainer:
     
 
 if __name__ == '__main__':
-    t = Trainer(0, 0.3, 2, 100)
+    elitism = 1
+    p = 0.1
+    jump_distance = 2
+    iters = 20
+    t = Trainer(elitism, p, jump_distance, iters)
     t.train()
     b = t.best
     m = domain.mesh(b.heights_tuple)
