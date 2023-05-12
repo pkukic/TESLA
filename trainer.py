@@ -100,8 +100,9 @@ class Trainer:
         #     self.population = list(executor.map(evaluate_unit, self.population))
         
         # SINGLE PROCESS, SINGLE THREAD
-        for u in self.population:
+        for i, u in enumerate(self.population):
             u.evaluate()
+            print(f"Goodness of child {i}: {u.goodness}")
         self.population = sorted(self.population, key=lambda u: float(u.goodness), reverse=True)
         
         best_units = self.population[:self.elitism]

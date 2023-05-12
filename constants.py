@@ -75,7 +75,7 @@ INITIAL_MESH_RESOLUTION = 150
 FS_DEGREE = 3
 
 # Population size for the genetic algorithm
-POPSIZE = 8
+POPSIZE = 20
 
 # Number of polygon points which can be tuned
 N_POLY_TUNE = 11
@@ -84,8 +84,8 @@ N_POLY_TUNE = 11
 N_HEIGHTS = 11
 
 # Number of simulations run to establish the goodness of a unit
-N_SIMS_PER_UNIT = 8
+N_SIMS_PER_UNIT = 10
 
 ### Note: given that on my laptop, the speed of one evaluate() is about
-### one minute, one epoch = POPSIZE * N_SIMS_PER_UNIT * 1 minute/unit
-### should be equal to 1 hour
+### 20 seconds, one epoch = POPSIZE * N_SIMS_PER_UNIT * 20 seconds/unit
+### should be equal to about 1 hour
