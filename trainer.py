@@ -86,18 +86,18 @@ class Trainer:
     
     def train_step(self):
         # MULTIPROCESSING
-        num_processes = 8
-        with Pool(processes=num_processes) as pool:
-            self.population = list(pool.map(evaluate_unit, self.population, chunksize=int(constants.POPSIZE / num_processes)))
+        # num_processes = 8
+        # with Pool(processes=num_processes) as pool:
+        #     self.population = list(pool.map(evaluate_unit, self.population, chunksize=int(constants.POPSIZE / num_processes)))
         
         # MULTITHREADING
-        # num_workers = 8
+        # num_workers = 4
         # with ThreadPoolExecutor(max_workers=num_workers) as executor:
         #     self.population = list(executor.map(evaluate_unit, self.population))
         
         # SINGLE PROCESS, SINGLE THREAD
-        # for u in self.population:
-        #     u.evaluate()
+        for u in self.population:
+            u.evaluate()
         self.population = sorted(self.population, key=lambda u: float(u.goodness), reverse=True)
         
         best_units = self.population[:self.elitism]
