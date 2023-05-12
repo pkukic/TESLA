@@ -15,15 +15,15 @@ import constants
 import domain
 
 def eps():
-    return abs(np.random.normal(0.0, 1e-2))
+    return abs(np.random.normal(0.0, 1e-9))
 
 class Unit:
     def __init__(self, heights_tuple, init_err = None):
         self.heights_tuple = heights_tuple
         if init_err is None:
-            self.err = np.float64(1e10) + eps()
+            self.err = np.float64(1e9)
         else:
-            self.err = init_err + eps()
+            self.err = init_err
         self.goodness = -np.log10(self.err)
 
     def evaluate(self):
@@ -37,7 +37,7 @@ class Unit:
         new_heights_list = []
         for (h1, h2) in zip(self.heights_tuple, other.heights_tuple):
             new_heights_list.append(round((h1 + h2) / 2))
-        return Unit(tuple(new_heights_list))
+        return Unit(tuple(new_heights_list), (self.err + other.err) / 2)
     
     @staticmethod
     def _pick_new_height(height, jump_dist):
@@ -52,7 +52,7 @@ class Unit:
         p_arr = np.random.uniform(0, 1, constants.N_POLY_TUNE)
         lower = p_arr < p
         higher = p_arr >= p
-        return Unit(tuple(lower * new_heights_arr + higher * old_heights_arr))
+        return Unit(tuple(lower * new_heights_arr + higher * old_heights_arr), self.err)
     
     def __repr__(self):
         return str(self.heights_tuple)
@@ -86,7 +86,8 @@ class Trainer:
         n_children = self.popsize - self.elitism
         if n_children > 0:
             all_tuples = np.array([(i,j) for i in range(n_children) for j in range(i+1,n_children)])
-            selected_tuples = np.random.choice(len(all_tuples), self.popsize, replace=False)
+            r = len(all_tuples) < self.popsize
+            selected_tuples = np.random.choice(len(all_tuples), self.popsize, replace=r)
             return all_tuples[selected_tuples]
         return []
     
@@ -108,7 +109,7 @@ class Trainer:
         self.population = sorted(self.population, key=lambda u: float(u.goodness), reverse=True)
         
         best_units = self.population[:self.elitism]
-        new_population: best_units[:]
+        new_population = best_units[:]
         
         # print(new_population)
 
@@ -156,6 +157,9 @@ if __name__ == '__main__':
     jump_distance = 2
     iters = 20
     t = Trainer(elitism, p, jump_distance, iters)
+    
+    # t = Trainer.load('/home/patrik/Drive/Current/Završni/Neuromorphic computing/Code/novo/TESLA/population_iter=1_elitism=0_p=0.1_jump_dist=2_err=0.001389.pickle')
+    
     t.train()
     b = t.best
     m = domain.mesh(b.heights_tuple)
