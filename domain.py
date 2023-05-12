@@ -14,6 +14,7 @@ parameters["form_compiler"]["cpp_optimize"] = True
 
 from constants import *
 
+
 @functools.lru_cache
 def domain(height_arr):
     start = [
@@ -31,6 +32,7 @@ def domain(height_arr):
 
     domain_vertices = start + middle + end
     return ms.Polygon(domain_vertices)
+
 
 @functools.lru_cache
 def subdomain(height_arr):
@@ -53,39 +55,11 @@ def subdomain(height_arr):
     return ms.Polygon(subdomain_vertices)
 
 
-# domain_vertices = [
-#     Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT),
-#     Point(X_TOP_RIGHT, Y_BOTTOM_LEFT),
-#     Point(X_TOP_RIGHT, Y_TOP_RIGHT), 
-#     Point(400.0, Y_TOP_RIGHT), 
-#     Point(350.0, 25.0),
-#     Point(300.0, Y_TOP_RIGHT),
-#     Point(X_BOTTOM_LEFT, Y_TOP_RIGHT),
-#     Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT)
-# ]
-
-# domain = ms.Polygon(domain_vertices)
-
-# x_left = DISCARDED_WIDTH_EACH_SIDE
-# x_right = WIDTH - DISCARDED_WIDTH_EACH_SIDE
-# submesh_vertices = [
-#     Point(x_left, Y_BOTTOM_LEFT),
-#     Point(x_right, Y_BOTTOM_LEFT),
-#     Point(x_right, Y_TOP_RIGHT), 
-#     Point(400.0, Y_TOP_RIGHT), 
-#     Point(350.0, 25.0),
-#     Point(300.0, Y_TOP_RIGHT),
-#     Point(x_left, Y_TOP_RIGHT),
-#     Point(x_left, Y_BOTTOM_LEFT)
-# ]
-
-# subdomain = ms.Polygon(submesh_vertices)
-
 @functools.lru_cache
-def refine_function(mesh):
+def refine_function(mesh, x_start, x_end):
     # Define the mesh density function
     def mesh_density(x):
-        if x[0] >= 10 and x[0] <= 40:
+        if x[0] >= x_start and x[0] <= x_end:
             return True
         else:
             return False
@@ -99,67 +73,42 @@ def refine_function(mesh):
 
     return mf
 
+
 @functools.lru_cache
 def mesh(height_arr):
     m = ms.generate_mesh(domain(height_arr), INITIAL_MESH_RESOLUTION)
 
-    mf = refine_function(m)
-    m = fe.refine(m, mf)
+    mf_1 = refine_function(m, 10, 40)
+    m = fe.refine(m, mf_1)
 
-    mf = refine_function(m)
-    m = fe.refine(m, mf)
-
-    mf = refine_function(m)
-    m = fe.refine(m, mf)
+    mf_2 = refine_function(m, 20, 30)
+    m = fe.refine(m, mf_2)
 
     return m
+
 
 @functools.lru_cache
 def mesh_sub(height_arr):
     m = ms.generate_mesh(subdomain(height_arr), INITIAL_MESH_RESOLUTION)
-    
-    mf = refine_function(m)
-    m = fe.refine(m, mf)
 
-    mf = refine_function(m)
-    m = fe.refine(m, mf)
+    mf_1 = refine_function(m, 10, 40)
+    m = fe.refine(m, mf_1)
 
-    mf = refine_function(m)
-    m = fe.refine(m, mf)
+    mf_2 = refine_function(m, 20, 30)
+    m = fe.refine(m, mf_2)
 
     return m   
+
 
 @functools.lru_cache
 def mesh_avg_areas(height_arr):
     return utils.areas_from_mesh(mesh(height_arr))
 
+
 @functools.lru_cache
 def mesh_sub_avg_areas(height_arr):
     return utils.areas_from_mesh(mesh_sub(height_arr))
 
-# @functools.lru_cache
-# def mesh_avg_areas():
-#     if os.path.exists('mesh_avg_areas.pickle'):
-#         with open('mesh_avg_areas.pickle', 'rb') as f:
-#             mesh_avg_areas = pickle.load(f)
-#         return mesh_avg_areas
-#     else:
-#         mesh_avg_areas = utils.areas_from_mesh(mesh())
-#         with open('mesh_avg_areas.pickle', 'wb+') as f:
-#             pickle.dump(mesh_avg_areas, f, pickle.HIGHEST_PROTOCOL)
-#         return mesh_avg_areas
-
-# @functools.lru_cache
-# def mesh_sub_avg_areas():
-#     if os.path.exists('mesh_sub_avg_areas.pickle'):
-#         with open('mesh_sub_avg_areas.pickle', 'rb') as f:
-#             mesh_sub_avg_areas = pickle.load(f)
-#         return mesh_sub_avg_areas
-#     else:
-#         mesh_sub_avg_areas = utils.areas_from_mesh(mesh_sub())
-#         with open('mesh_sub_avg_areas.pickle', 'wb+') as f:
-#             pickle.dump(mesh_sub_avg_areas, f, pickle.HIGHEST_PROTOCOL)
-#         return mesh_sub_avg_areas
 
 @functools.lru_cache
 def lagrange_function_space(height_arr):
@@ -169,6 +118,7 @@ def lagrange_function_space(height_arr):
             FS_DEGREE
     )
 
+
 @functools.lru_cache
 def lagrange_function_sub_space(height_arr):
     return fe.FunctionSpace(
@@ -176,6 +126,7 @@ def lagrange_function_sub_space(height_arr):
         'CG', 
         FS_DEGREE
     )
+
 
 @functools.lru_cache
 def lagrange_vector_sub_space(height_arr):
