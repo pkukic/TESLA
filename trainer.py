@@ -152,7 +152,7 @@ class Trainer:
     
 
 if __name__ == '__main__':
-    elitism = 0
+    elitism = 1
     p = 0.1
     jump_distance = 2
     iters = 20
