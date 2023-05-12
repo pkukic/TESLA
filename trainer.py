@@ -14,19 +14,21 @@ import sim
 import constants
 import domain
 
+def eps():
+    return abs(np.random.normal(0.0, 1e-2))
 
 class Unit:
     def __init__(self, heights_tuple, init_err = None):
         self.heights_tuple = heights_tuple
         if init_err is None:
-            self.err = np.float64(1e10)
+            self.err = np.float64(1e10) + eps()
         else:
-            self.err = init_err
+            self.err = init_err + eps()
         self.goodness = -np.log10(self.err)
 
     def evaluate(self):
         err = sim.error_from_n_sims(constants.N_SIMS_PER_UNIT, self.heights_tuple)
-        self.err = err
+        self.err = err + eps()
         self.goodness = -np.log10(self.err)
         return
 
@@ -149,7 +151,7 @@ class Trainer:
     
 
 if __name__ == '__main__':
-    elitism = 1
+    elitism = 0
     p = 0.1
     jump_distance = 2
     iters = 20
