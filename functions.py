@@ -43,11 +43,13 @@ class FunctionSolver:
         self.mesh_sub_avg_areas = domain.mesh_sub_avg_areas(height_arr)
         self.mesh_sub_coords = self.mesh_sub.coordinates()
 
+
     @staticmethod
     def G(electric_field_values):
         electric_field_values = np.array(electric_field_values, np.float128)
         return constants.G_0 * np.exp(-(constants.E_A - constants.B * electric_field_values) / (constants.K_B * constants.T))
     
+
     def new_sigma_from_pc(self, pc_values, old_sigma_values):
         new_sigma_values = np.copy(old_sigma_values)
         p = np.random.uniform(0, 1, pc_values.size)
@@ -74,24 +76,10 @@ class FunctionSolver:
         new_sigma_function.vector().set_local(sigma_vals)
         new_sigma_function.set_allow_extrapolation(True)
 
-        # print('Plotting new_sigma')
-        # c = plot(new_sigma_function, cmap='inferno')
-        # plt.gca().set_aspect('equal')
-        # plt.colorbar(c, fraction=0.047*1/10)
-        # plt.show()
-
         # new_sigma_wider = fe.Function(constants.lagrange_function_space())
         new_sigma_wider = fe.Function(self.lagrange_function_space, mesh=self.mesh)
         new_sigma_wider.assign(fe.project(v=SigmaExpr(new_sigma_function), V=self.lagrange_function_space))
         new_sigma_wider.set_allow_extrapolation(True)
-        # print(new_sigma_wider(50, 10))
-        # print(new_sigma_wider(350, 25))
-
-        # print('Plotting new_sigma_wider')
-        # c = plot(new_sigma_wider, cmap='inferno')
-        # plt.gca().set_aspect('equal')
-        # plt.colorbar(c, fraction=0.047*1/10)
-        # plt.show()
 
         return new_sigma_wider
 
@@ -162,7 +150,6 @@ if __name__ == '__main__':
     print('Computed.')
 
     print(i)
-
 
     c = plot(e, cmap='inferno')
     plt.gca().set_aspect('equal')

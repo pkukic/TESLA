@@ -1,11 +1,8 @@
 import numpy as np
-from dolfin import cells
-
+import dolfin as dol
 import functools
 
 def triangle_area(triangle_vertices):
-    # print(triangle_vertices)
-    # print(triangle_vertices.shape)
     ones_column = np.ones((triangle_vertices.shape[0], 1))
     vert_with_ones = np.column_stack((triangle_vertices, ones_column))
     return abs(0.5 * np.linalg.det(vert_with_ones))
@@ -16,7 +13,7 @@ def triangle_area_arr(triangles):
 @functools.lru_cache
 def areas_from_mesh(mesh):
     vertex_to_cell = {}
-    for cell in cells(mesh):
+    for cell in dol.cells(mesh):
         for vertex in cell.entities(0):
             if vertex not in vertex_to_cell:
                 vertex_to_cell[vertex] = []
