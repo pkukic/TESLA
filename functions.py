@@ -33,27 +33,29 @@ class SigmaExpr(fe.UserExpression):
 class FunctionSolver:
     def __init__(self, height_arr):
         self.height_arr = height_arr
+        
         self.lagrange_function_space = domain.lagrange_function_space(height_arr)
         self.lagrange_function_sub_space = domain.lagrange_function_sub_space(height_arr)
         self.lagrange_vector_sub_space = domain.lagrange_vector_sub_space(height_arr)
+        
         self.mesh = domain.mesh(height_arr)
         self.mesh_sub = domain.mesh_sub(height_arr)
-        self.avg_areas = domain.mesh_sub_avg_areas(height_arr)
+        self.mesh_sub_avg_areas = domain.mesh_sub_avg_areas(height_arr)
+        self.mesh_sub_coords = self.mesh_sub.coordinates()
 
     @staticmethod
     def G(electric_field_values):
         electric_field_values = np.array(electric_field_values, np.float128)
         return constants.G_0 * np.exp(-(constants.E_A - constants.B * electric_field_values) / (constants.K_B * constants.T))
     
-    @staticmethod
-    def new_sigma_from_pc(pc_values, coords, old_sigma_values):
+    def new_sigma_from_pc(self, pc_values, old_sigma_values):
         new_sigma_values = np.copy(old_sigma_values)
         p = np.random.uniform(0, 1, pc_values.size)
 
         ind = np.argwhere(p < pc_values)
-        c_zero = coords[ind]
+        c_zero = self.mesh_sub_coords[ind]
         for ci in c_zero:
-            dist_vector = np.linalg.norm(coords - ci)
+            dist_vector = np.linalg.norm(self.mesh_sub_coords - ci)
             close_to_ci = np.argwhere(dist_vector < constants.R)
             ind = np.union1d(ind, close_to_ci)
 
@@ -63,7 +65,7 @@ class FunctionSolver:
 
     def P_c(self, g_values):
         g_values = np.array(g_values, np.float128)
-        avg_areas = np.array(self.avg_areas, np.float128)
+        avg_areas = np.array(self.mesh_sub_avg_areas, np.float128)
         return 1 - np.exp(- g_values * avg_areas * constants.A_F * constants.DELTA_T)
 
 
@@ -131,15 +133,15 @@ if __name__ == '__main__':
     print('Computing G, P_c and sigma...')
 
     fs = FunctionSolver(height_arr)
+
     sigma_sub = fe.Function(fs.lagrange_function_sub_space)
     sigma_sub.assign(fe.interpolate(sigma, fs.lagrange_function_sub_space))
     sigma_sub_values = sigma_sub.compute_vertex_values()
 
-    coords = fs.mesh_sub.coordinates()
-    g_values = FunctionSolver.G(e_values)
-    
+    g_values = FunctionSolver.G(e_values)    
     pc_values = fs.P_c(g_values)
-    new_sigma_values = fs.new_sigma_from_pc(pc_values, coords, sigma_sub_values)
+    new_sigma_values = fs.new_sigma_from_pc(pc_values, sigma_sub_values)
+    new_sigma = fs.sigma_f_from_vals(new_sigma_values)
 
     print('Computed.')
 
@@ -148,18 +150,17 @@ if __name__ == '__main__':
     print(pc_values)
     print(new_sigma_values)
 
-    print(coords[np.argmax(e_values)], np.max(e_values))
-    print(coords[np.argmax(g_values)], np.max(g_values))
-    print(coords[np.argmax(pc_values)], np.max(pc_values))
-    print(coords[np.argmax(new_sigma_values)], np.max(new_sigma_values))
+    print(fs.mesh_sub_coords[np.argmax(e_values)], np.max(e_values))
+    print(fs.mesh_sub_coords[np.argmax(g_values)], np.max(g_values))
+    print(fs.mesh_sub_coords[np.argmax(pc_values)], np.max(pc_values))
+    print(fs.mesh_sub_coords[np.argmax(new_sigma_values)], np.max(new_sigma_values))
 
-    print('Computing new sigma...')
+    print('Computing current...')
 
-    new_sigma = fs.sigma_f_from_vals(new_sigma_values)
+    i = fs.I(new_sigma, e_vect)
 
     print('Computed.')
 
-    i = fs.I(new_sigma, e_vect)
     print(i)
 
 
