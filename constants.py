@@ -73,3 +73,15 @@ INITIAL_MESH_RESOLUTION = 200
 
 # Degree of Lagrangian elements
 FS_DEGREE = 3
+
+# Population size for the genetic algorithm
+POPSIZE = 8
+
+# Number of polygon points which can be tuned
+N_POLY_TUNE = 11
+
+# Number of discrete top electrode protrusion heights
+N_HEIGHTS = 11
+
+# Number of simulations run to establish the goodness of a unit
+N_SIMS_PER_UNIT = 20
