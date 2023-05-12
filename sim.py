@@ -35,7 +35,7 @@ def single_sim(height_arr):
         new_sigma = fs.sigma_f_from_vals(new_sigma_values)
 
         current = fs.I(new_sigma, e_vect)
-        # print(f'Current at iteration: {current}')
+        print(f'Voltage at iteration: {top_potential}')
 
         time += constants.DELTA_T
         top_potential += constants.DELTA_T * constants.VR

@@ -54,7 +54,7 @@ T = 300.0
 
 # Time simulation step
 # In seconds
-DELTA_T = 1e-2
+DELTA_T = 1 * 1e-2
 
 # Initial time
 # In seconds
@@ -62,14 +62,14 @@ INITIAL_TIME = 0.0
 
 # Compliance current
 # In amperes
-I_CC = 1 * 1e-3
+I_CC = 1 * 1e-2
 
 # Voltage ramp-up rate
 # In volts / second
-VR = 1.0
+VR = 5.0
 
 # This is some 0-dimensional magic number
-INITIAL_MESH_RESOLUTION = 180
+INITIAL_MESH_RESOLUTION = 150
 
 # Degree of Lagrangian elements
 FS_DEGREE = 3
