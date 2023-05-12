@@ -1,5 +1,6 @@
 from dolfin import plot
 import numpy as np
+import pickle
 
 from multiprocessing import Pool
 from concurrent.futures import ThreadPoolExecutor
@@ -65,6 +66,9 @@ class Trainer:
         self.p = p
         self.jump_dist = jump_dist
         self.iter = iter
+
+        self.curr_i = 0
+        self.from_pickle = False
         
         self.population = []
         self.best = None
@@ -118,14 +122,29 @@ class Trainer:
         self.best_unit_error = self.best.err
 
         return
+    
+    def save_population(self):
+        pop_name = f"population_iter={self.curr_i}_elitism={self.elitism}_p={self.p}_jump_dist={self.jump_dist}_err={(self.best_unit_error):.6f}.pickle"
+        with open(pop_name, 'wb+') as f:
+            pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
+        return
 
     def train(self):
-        self.initialize_population()
-        for i in range(self.iter):
+        if not self.from_pickle:
+            self.initialize_population()
+        for i_ in range(self.iter):
+            self.curr_i += 1
             self.train_step()
-            print(f"[Train error @{i + 1}]: {(self.best_unit_error):.6f} | Best unit: {self.best}\n")
+            print(f"[Train error @{self.curr_i}]: {(self.best_unit_error):.6f} | Best unit: {self.best}\n")
+            self.save_population()
         self.best = max(self.population, key=lambda u: float(u.goodness))
         return
+    
+    @staticmethod
+    def load(fname):
+        with open(fname, 'rb') as f:
+            trainer = pickle.load(f)
+        return trainer
     
 
 if __name__ == '__main__':
