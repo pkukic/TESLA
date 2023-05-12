@@ -8,9 +8,13 @@ WIDTH = 500.0 + DISCARDED_WIDTH_EACH_SIDE * 2
 X_BOTTOM_LEFT, Y_BOTTOM_LEFT = (0.0, 0.0)
 X_TOP_RIGHT, Y_TOP_RIGHT = (WIDTH, HEIGHT)
 
-# The potentials are in volts
+# The potentials 
+# In volts
 INITIAL_TOP_POTENTIAL = 0.0
 BOTTOM_POTENTIAL = 0.0
+
+# Initial current
+INITAL_CURRENT = 0.0
 
 # Electrical conductivity of oxide
 # In sieverts/angstrom
