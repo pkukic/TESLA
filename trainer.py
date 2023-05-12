@@ -2,6 +2,7 @@ from dolfin import plot
 import numpy as np
 
 from multiprocessing import Pool
+from concurrent.futures import ThreadPoolExecutor
 
 import matplotlib
 matplotlib.use('Qt5Agg')
@@ -84,8 +85,19 @@ class Trainer:
         return []
     
     def train_step(self):
-        with Pool(processes=self.popsize) as pool:
-            pool.map(evaluate_unit, self.population)
+        # MULTIPROCESSING
+        num_processes = 8
+        with Pool(processes=num_processes) as pool:
+            self.population = list(pool.map(evaluate_unit, self.population, chunksize=int(constants.POPSIZE / num_processes)))
+        
+        # MULTITHREADING
+        # num_workers = 8
+        # with ThreadPoolExecutor(max_workers=num_workers) as executor:
+        #     self.population = list(executor.map(evaluate_unit, self.population))
+        
+        # SINGLE PROCESS, SINGLE THREAD
+        # for u in self.population:
+        #     u.evaluate()
         self.population = sorted(self.population, key=lambda u: float(u.goodness), reverse=True)
         
         best_units = self.population[:self.elitism]

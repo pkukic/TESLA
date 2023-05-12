@@ -62,14 +62,14 @@ INITIAL_TIME = 0.0
 
 # Compliance current
 # In amperes
-I_CC = 1 * 1e-4
+I_CC = 1 * 1e-3
 
 # Voltage ramp-up rate
 # In volts / second
 VR = 1.0
 
 # This is some 0-dimensional magic number
-INITIAL_MESH_RESOLUTION = 200
+INITIAL_MESH_RESOLUTION = 180
 
 # Degree of Lagrangian elements
 FS_DEGREE = 3
@@ -84,4 +84,4 @@ N_POLY_TUNE = 11
 N_HEIGHTS = 11
 
 # Number of simulations run to establish the goodness of a unit
-N_SIMS_PER_UNIT = 20
+N_SIMS_PER_UNIT = 10
