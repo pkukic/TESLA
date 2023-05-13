@@ -84,4 +84,4 @@ N_POLY_TUNE = 9
 N_HEIGHTS = 11
 
 # Number of simulations run to establish the goodness of a unit
-N_SIMS_PER_UNIT = 5
+N_SIMS_PER_UNIT = 20

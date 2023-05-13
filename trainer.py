@@ -62,9 +62,8 @@ def evaluate_unit(unit):
     return
 
 class Trainer:
-    def __init__(self, elitism, p, jump_dist, iter):
+    def __init__(self, p, jump_dist, iter):
         self.popsize = constants.POPSIZE
-        self.elitism = elitism
         self.p = p
         self.jump_dist = jump_dist
         self.iter = iter
@@ -82,14 +81,23 @@ class Trainer:
             self.population.append(u)
         return
 
-    def random_indices(self):
-        n_children = self.popsize - self.elitism
-        if n_children > 0:
-            all_tuples = np.array([(i,j) for i in range(n_children) for j in range(i+1,n_children)])
-            r = len(all_tuples) < self.popsize
-            selected_tuples = np.random.choice(len(all_tuples), self.popsize, replace=r)
-            return all_tuples[selected_tuples]
-        return []
+    import numpy as np
+
+    def roulette_wheel_selection(self):
+        fitness_vals = np.array([u.goodness for u in self.population])
+        sum_fitness = np.sum(fitness_vals)
+        probabilities = fitness_vals / sum_fitness
+        cumulative_probabilities = np.cumsum(probabilities)
+
+        parent_indices = np.zeros((self.popsize, 2), dtype=int)
+        for i in range(self.popsize):
+            # select two parents
+            for j in range(2):
+                rand_val = np.random.rand()
+                parent_index = np.searchsorted(cumulative_probabilities, rand_val)
+                parent_indices[i,j] = parent_index
+        return parent_indices
+
 
     def train_step(self):
         # MULTIPROCESSING
@@ -110,14 +118,8 @@ class Trainer:
             # plt.gca().set_aspect('equal')
             # plt.show()
             print(f"Goodness of child {i}: {u.goodness}")
-        self.population = sorted(self.population, key=lambda u: float(u.goodness), reverse=True)
 
-        best_units = self.population[:self.elitism]
-        new_population = best_units[:]
-
-        # print(new_population)
-
-        pairs = self.random_indices()
+        pairs = self.parent_indices()
         for (i, j) in pairs:
             new_population.append(self.population[i].crossover(self.population[j]).mutate(self.p, self.jump_dist))
 
@@ -132,7 +134,7 @@ class Trainer:
         return
 
     def save_population(self):
-        pop_name = f"population_iter={self.curr_i}_elitism={self.elitism}_p={self.p}_jump_dist={self.jump_dist}_goodness={(self.best.goodness):.3f}.pickle"
+        pop_name = f"population_iter={self.curr_i}_p={self.p}_jump_dist={self.jump_dist}_goodness={(self.best.goodness):.3f}.pickle"
         with open(pop_name, 'wb+') as f:
             pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
         return
@@ -156,13 +158,12 @@ class Trainer:
 
 
 if __name__ == '__main__':
-    elitism = 1
     p = 0.1
     jump_distance = 2
     iters = 20
-    t = Trainer(elitism, p, jump_distance, iters)
+    t = Trainer(p, jump_distance, iters)
 
-    # t = Trainer.load('/home/patrik/Drive/Current/Završni/Neuromorphic computing/Code/novo/TESLA/population_iter=7_elitism=1_p=0.1_jump_dist=2.pickle')
+    # t = Trainer.load('/home/patrik/Drive/Current/Završni/Neuromorphic computing/Code/novo/TESLA/population_iter=1_elitism=1_p=0.1_jump_dist=2_goodness=10.256.pickle')
 
     t.train()
     b = t.best
