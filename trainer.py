@@ -105,6 +105,10 @@ class Trainer:
         # SINGLE PROCESS, SINGLE THREAD
         for i, u in enumerate(self.population):
             u.evaluate()
+            m = domain.mesh(u.heights_tuple)
+            plot(m)
+            plt.gca().set_aspect('equal')
+            plt.show()
             print(f"Goodness of child {i}: {u.goodness}")
         self.population = sorted(self.population, key=lambda u: float(u.goodness), reverse=True)
 
@@ -128,7 +132,7 @@ class Trainer:
         return
 
     def save_population(self):
-        pop_name = f"population_iter={self.curr_i}_elitism={self.elitism}_p={self.p}_jump_dist={self.jump_dist}.pickle"
+        pop_name = f"population_iter={self.curr_i}_elitism={self.elitism}_p={self.p}_jump_dist={self.jump_dist}_goodness={(self.best.goodness):.3f}.pickle"
         with open(pop_name, 'wb+') as f:
             pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
         return

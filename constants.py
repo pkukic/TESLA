@@ -69,7 +69,7 @@ I_CC = 1 * 1e-2
 VR = 5.0
 
 # This is some 0-dimensional magic number
-INITIAL_MESH_RESOLUTION = 150
+INITIAL_MESH_RESOLUTION = 100
 
 # Degree of Lagrangian elements
 FS_DEGREE = 3
@@ -84,8 +84,4 @@ N_POLY_TUNE = 9
 N_HEIGHTS = 11
 
 # Number of simulations run to establish the goodness of a unit
-N_SIMS_PER_UNIT = 10
-
-### Note: given that on my laptop, the speed of one evaluate() is about
-### 20 seconds, one epoch = POPSIZE * N_SIMS_PER_UNIT * 20 seconds/unit
-### should be equal to about 1 hour
+N_SIMS_PER_UNIT = 5

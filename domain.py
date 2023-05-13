@@ -78,10 +78,10 @@ def refine_function(mesh, x_start, x_end):
 def mesh(height_arr):
     m = ms.generate_mesh(domain(height_arr), INITIAL_MESH_RESOLUTION)
 
-    mf_1 = refine_function(m, 10, 40)
+    mf_1 = refine_function(m, 150, 550)
     m = fe.refine(m, mf_1)
 
-    mf_2 = refine_function(m, 20, 30)
+    mf_2 = refine_function(m, 250, 450)
     m = fe.refine(m, mf_2)
 
     return m
@@ -91,10 +91,10 @@ def mesh(height_arr):
 def mesh_sub(height_arr):
     m = ms.generate_mesh(subdomain(height_arr), INITIAL_MESH_RESOLUTION)
 
-    mf_1 = refine_function(m, 10, 40)
+    mf_1 = refine_function(m, 150, 550)
     m = fe.refine(m, mf_1)
 
-    mf_2 = refine_function(m, 20, 30)
+    mf_2 = refine_function(m, 250, 450)
     m = fe.refine(m, mf_2)
 
     return m   
