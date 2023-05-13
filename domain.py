@@ -16,12 +16,14 @@ def domain(height_arr):
     start = [
         Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT),
         Point(X_TOP_RIGHT, Y_BOTTOM_LEFT),
-        Point(X_TOP_RIGHT, Y_TOP_RIGHT), 
+        Point(X_TOP_RIGHT, Y_TOP_RIGHT),
+        Point(400, Y_TOP_RIGHT), 
     ]
 
-    middle = [Point(400 - 10*i, 50 - 2.5*h) for i, h in enumerate(height_arr)]
+    middle = [Point(390 - 10*i, 50 - 2.5*h) for i, h in enumerate(height_arr)]
 
     end = [
+        Point(300, Y_TOP_RIGHT),
         Point(X_BOTTOM_LEFT, Y_TOP_RIGHT),
         Point(X_BOTTOM_LEFT, Y_BOTTOM_LEFT),
     ]
@@ -37,12 +39,14 @@ def subdomain(height_arr):
     start = [
         Point(x_left, Y_BOTTOM_LEFT),
         Point(x_right, Y_BOTTOM_LEFT),
-        Point(x_right, Y_TOP_RIGHT), 
+        Point(x_right, Y_TOP_RIGHT),
+        Point(400, Y_TOP_RIGHT), 
     ]
 
-    middle = [Point(400 - 10*i, 50 - 2.5*h) for i, h in enumerate(height_arr)]
+    middle = [Point(390 - 10*i, 50 - 2.5*h) for i, h in enumerate(height_arr)]
 
     end = [
+        Point(300, Y_TOP_RIGHT),
         Point(x_left, Y_TOP_RIGHT),
         Point(x_left, Y_BOTTOM_LEFT)
     ]

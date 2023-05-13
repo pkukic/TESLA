@@ -38,7 +38,7 @@ class Unit:
         for (h1, h2) in zip(self.heights_tuple, other.heights_tuple):
             new_heights_list.append(round((h1 + h2) / 2))
         return Unit(tuple(new_heights_list), (self.err + other.err) / 2)
-    
+
     @staticmethod
     def _pick_new_height(height, jump_dist):
         height_low = np.clip(height - jump_dist, 0, constants.N_HEIGHTS - 1)
@@ -46,14 +46,14 @@ class Unit:
         return np.random.randint(height_low, height_high + 1)
 
     def mutate(self, p, jump_dist):
-        new_heights_arr = [Unit._pick_new_height(self.heights_tuple[i], jump_dist) 
+        new_heights_arr = [Unit._pick_new_height(self.heights_tuple[i], jump_dist)
                            for i in range(constants.N_POLY_TUNE)]
         old_heights_arr = list(self.heights_tuple)
         p_arr = np.random.uniform(0, 1, constants.N_POLY_TUNE)
         lower = p_arr < p
         higher = p_arr >= p
         return Unit(tuple(lower * new_heights_arr + higher * old_heights_arr), self.err)
-    
+
     def __repr__(self):
         return str(self.heights_tuple)
 
@@ -71,7 +71,7 @@ class Trainer:
 
         self.curr_i = 0
         self.from_pickle = False
-        
+
         self.population = []
         self.best = None
         self.best_unit_error = np.float64(0)
@@ -81,7 +81,7 @@ class Trainer:
             u = Unit(tuple(np.random.randint(constants.N_HEIGHTS, size=constants.N_POLY_TUNE)))
             self.population.append(u)
         return
-    
+
     def random_indices(self):
         n_children = self.popsize - self.elitism
         if n_children > 0:
@@ -90,33 +90,33 @@ class Trainer:
             selected_tuples = np.random.choice(len(all_tuples), self.popsize, replace=r)
             return all_tuples[selected_tuples]
         return []
-    
+
     def train_step(self):
         # MULTIPROCESSING
         # num_processes = 8
         # with Pool(processes=num_processes) as pool:
         #     self.population = list(pool.map(evaluate_unit, self.population, chunksize=int(constants.POPSIZE / num_processes)))
-        
+
         # MULTITHREADING
         # num_workers = 4
         # with ThreadPoolExecutor(max_workers=num_workers) as executor:
         #     self.population = list(executor.map(evaluate_unit, self.population))
-        
+
         # SINGLE PROCESS, SINGLE THREAD
         for i, u in enumerate(self.population):
             u.evaluate()
             print(f"Goodness of child {i}: {u.goodness}")
         self.population = sorted(self.population, key=lambda u: float(u.goodness), reverse=True)
-        
+
         best_units = self.population[:self.elitism]
         new_population = best_units[:]
-        
+
         # print(new_population)
 
         pairs = self.random_indices()
         for (i, j) in pairs:
             new_population.append(self.population[i].crossover(self.population[j]).mutate(self.p, self.jump_dist))
-        
+
         new_population = sorted(new_population, key=lambda u:float(u.goodness), reverse=True)
         # print(new_population)
 
@@ -126,9 +126,9 @@ class Trainer:
         self.best_unit_error = self.best.err
 
         return
-    
+
     def save_population(self):
-        pop_name = f"population_iter={self.curr_i}_elitism={self.elitism}_p={self.p}_jump_dist={self.jump_dist}_err={(self.best_unit_error):.6f}.pickle"
+        pop_name = f"population_iter={self.curr_i}_elitism={self.elitism}_p={self.p}_jump_dist={self.jump_dist}.pickle"
         with open(pop_name, 'wb+') as f:
             pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
         return
@@ -143,13 +143,13 @@ class Trainer:
             self.save_population()
         self.best = max(self.population, key=lambda u: float(u.goodness))
         return
-    
+
     @staticmethod
     def load(fname):
         with open(fname, 'rb') as f:
             trainer = pickle.load(f)
         return trainer
-    
+
 
 if __name__ == '__main__':
     elitism = 1
@@ -157,9 +157,9 @@ if __name__ == '__main__':
     jump_distance = 2
     iters = 20
     t = Trainer(elitism, p, jump_distance, iters)
-    
-    # t = Trainer.load('/home/patrik/Drive/Current/Završni/Neuromorphic computing/Code/novo/TESLA/population_iter=1_elitism=0_p=0.1_jump_dist=2_err=0.001389.pickle')
-    
+
+    # t = Trainer.load('/home/patrik/Drive/Current/Završni/Neuromorphic computing/Code/novo/TESLA/population_iter=7_elitism=1_p=0.1_jump_dist=2.pickle')
+
     t.train()
     b = t.best
     m = domain.mesh(b.heights_tuple)

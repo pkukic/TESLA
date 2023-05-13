@@ -78,7 +78,7 @@ FS_DEGREE = 3
 POPSIZE = 20
 
 # Number of polygon points which can be tuned
-N_POLY_TUNE = 11
+N_POLY_TUNE = 9
 
 # Number of discrete top electrode protrusion heights
 N_HEIGHTS = 11
