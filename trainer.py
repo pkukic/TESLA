@@ -105,10 +105,10 @@ class Trainer:
         # SINGLE PROCESS, SINGLE THREAD
         for i, u in enumerate(self.population):
             u.evaluate()
-            m = domain.mesh(u.heights_tuple)
-            plot(m)
-            plt.gca().set_aspect('equal')
-            plt.show()
+            # m = domain.mesh(u.heights_tuple)
+            # plot(m)
+            # plt.gca().set_aspect('equal')
+            # plt.show()
             print(f"Goodness of child {i}: {u.goodness}")
         self.population = sorted(self.population, key=lambda u: float(u.goodness), reverse=True)
 
