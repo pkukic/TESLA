@@ -119,7 +119,8 @@ class Trainer:
             # plt.show()
             print(f"Goodness of child {i}: {u.goodness}")
 
-        pairs = self.parent_indices()
+        new_population = []
+        pairs = self.roulette_wheel_selection()
         for (i, j) in pairs:
             new_population.append(self.population[i].crossover(self.population[j]).mutate(self.p, self.jump_dist))
 
