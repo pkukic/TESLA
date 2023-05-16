@@ -133,7 +133,7 @@ class Trainer:
         return
 
     def save_population(self):
-        pop_name = f"population_iter={self.curr_i}_p={self.p}_jump_dist={self.jump_dist}_goodness={(self.best.goodness):.3f}.pickle"
+        pop_name = f"population_iter={self.curr_i}_p={self.p}_jump_dist={self.jump_dist}_pop_goodness={(sum(u.goodness for u in self.population)):.3f}.pickle"
         with open(pop_name, 'wb+') as f:
             pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
         return
