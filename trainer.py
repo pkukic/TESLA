@@ -27,6 +27,7 @@ class Unit:
         self.goodness = -np.log10(self.err)
 
     def evaluate(self):
+        print(f"Evaluating: {self}")
         err = sim.error_from_n_sims(constants.N_SIMS_PER_UNIT, self.heights_tuple)
         self.err = err + eps()
         self.goodness = -np.log10(self.err)
@@ -56,10 +57,7 @@ class Unit:
 
     def __repr__(self):
         return str(self.heights_tuple)
-
-def evaluate_unit(unit):
-    unit.evaluate()
-    return
+    
 
 class Trainer:
     def __init__(self, p, jump_dist, iter):
@@ -117,7 +115,7 @@ class Trainer:
             # plot(m)
             # plt.gca().set_aspect('equal')
             # plt.show()
-            print(f"Goodness of child {i}: {u.goodness}")
+            print(f"Goodness of child {i} = {self.population[i]}: {u.goodness}")
 
         new_population = []
         pairs = self.roulette_wheel_selection()
@@ -155,16 +153,19 @@ class Trainer:
     def load(fname):
         with open(fname, 'rb') as f:
             trainer = pickle.load(f)
+        trainer.from_pickle = True
         return trainer
 
 
 if __name__ == '__main__':
-    p = 0.1
-    jump_distance = 2
-    iters = 20
-    t = Trainer(p, jump_distance, iters)
+    # p = 0.1
+    # jump_distance = 2
+    # iters = 20
+    # t = Trainer(p, jump_distance, iters)
 
-    # t = Trainer.load('/home/patrik/Drive/Current/Završni/Neuromorphic computing/Code/novo/TESLA/population_iter=1_elitism=1_p=0.1_jump_dist=2_goodness=10.256.pickle')
+    t = Trainer.load('/home/patrik/Drive/Current/Završni/Neuromorphic computing/Code/novo/TESLA/population_iter=3_p=0.1_jump_dist=2_goodness=9.200.pickle')
+
+    print(t.population)
 
     t.train()
     b = t.best
