@@ -14,6 +14,8 @@ import sim
 import constants
 import domain
 
+ELITISM = 2
+
 def eps():
     return abs(np.random.normal(0.0, 1e-9))
 
@@ -79,16 +81,14 @@ class Trainer:
             self.population.append(u)
         return
 
-    import numpy as np
-
     def roulette_wheel_selection(self):
         fitness_vals = np.array([u.goodness for u in self.population])
         sum_fitness = np.sum(fitness_vals)
         probabilities = fitness_vals / sum_fitness
         cumulative_probabilities = np.cumsum(probabilities)
 
-        parent_indices = np.zeros((self.popsize, 2), dtype=int)
-        for i in range(self.popsize):
+        parent_indices = np.zeros((self.popsize - ELITISM, 2), dtype=int)
+        for i in range(self.popsize - ELITISM):
             # select two parents
             for j in range(2):
                 rand_val = np.random.rand()
@@ -118,6 +118,9 @@ class Trainer:
             print(f"Goodness of child {i} = {self.population[i]}: {u.goodness}")
 
         new_population = []
+
+        new_population = sorted(self.population, key=lambda u:u.goodness, reverse=True)[:ELITISM]
+
         pairs = self.roulette_wheel_selection()
         for (i, j) in pairs:
             new_population.append(self.population[i].crossover(self.population[j]).mutate(self.p, self.jump_dist))
@@ -163,12 +166,14 @@ if __name__ == '__main__':
     # iters = 20
     # t = Trainer(p, jump_distance, iters)
 
-    t = Trainer.load('/home/patrik/Drive/Current/Završni/Neuromorphic computing/Code/novo/TESLA/population_iter=3_p=0.1_jump_dist=2_goodness=9.200.pickle')
+    t = Trainer.load('/home/patrik/Drive/Current/Završni/Neuromorphic computing/Code/novo/TESLA/population_iter=6_p=0.1_jump_dist=2_pop_goodness=106.519.pickle')
 
-    print(t.population)
+    print(t.best)
+    print(sum(u.goodness for u in t.population))
 
     t.train()
     b = t.best
+    print(b.goodness)
     m = domain.mesh(b.heights_tuple)
 
     plot(m)
