@@ -6,7 +6,7 @@ matplotlib.use('Qt5Agg')
 
 import matplotlib.pyplot as plt
 
-INITIAL_MESH_RESOLUTION = 60
+INITIAL_MESH_RESOLUTION = 20
 
 parameters["reorder_dofs_serial"] = False
 
@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     m = refine(m, mf)
 
-    plot(m)
+    plot(domain)
     plt.gca().set_aspect('equal')
     plt.show()
 

@@ -55,8 +55,9 @@ def error_from_n_sims(n, height_arr):
 
 
 if __name__ == '__main__':
-    height_arr = tuple([2*i for i in range(6)] + [20-2*i for i in range(6, 11)])
+    height_arr = tuple([2*i for i in range(4)] + [16-2*i for i in range(4, 9)])
     print(height_arr)
-    N = 20
+    print(len(height_arr))
+    N = 2
     err = error_from_n_sims(N, height_arr)
     print(err)

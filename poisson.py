@@ -89,7 +89,9 @@ class PoissonSolver:
 
 
 if __name__ == '__main__':
-    height_arr = tuple([2*i for i in range(6)] + [20-2*i for i in range(6, 11)])
+    height_arr = tuple([2*i for i in range(4)] + [16-2*i for i in range(4, 9)])
+    print(len(height_arr))
+    print(height_arr)
     ps = PoissonSolver(height_arr)
 
     sigma = fe.Expression('SIGMA_HRS', degree=1, SIGMA_HRS=constants.SIGMA_HRS, domain=ps.mesh)

@@ -171,7 +171,7 @@ if __name__ == '__main__':
     print(t.best)
     print(sum(u.goodness for u in t.population))
 
-    t.train()
+    # t.train()
     b = t.best
     print(b.goodness)
     m = domain.mesh(b.heights_tuple)
