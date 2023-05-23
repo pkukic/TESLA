@@ -16,9 +16,6 @@ import domain
 
 ELITISM = 2
 
-def eps():
-    return abs(np.random.normal(0.0, 1e-9))
-
 class Unit:
     def __init__(self, heights_tuple, init_err = None):
         self.heights_tuple = heights_tuple
@@ -28,10 +25,14 @@ class Unit:
             self.err = init_err
         self.goodness = -np.log10(self.err)
 
+    @staticmethod    
+    def eps():
+        return abs(np.random.normal(0.0, 1e-9))
+
     def evaluate(self):
         print(f"Evaluating: {self}")
         err = sim.error_from_n_sims(constants.N_SIMS_PER_UNIT, self.heights_tuple)
-        self.err = err + eps()
+        self.err = err + Unit.eps()
         self.goodness = -np.log10(self.err)
         return
 
@@ -42,13 +43,7 @@ class Unit:
             new_heights_list.append(round((h1 + h2) / 2))
         return Unit(tuple(new_heights_list), (self.err + other.err) / 2)
 
-    @staticmethod
-    def _pick_new_height(height, jump_dist):
-        height_low = np.clip(height - jump_dist, 0, constants.N_HEIGHTS - 1)
-        height_high = np.clip(height + jump_dist, 0, constants.N_HEIGHTS - 1)
-        return np.random.randint(height_low, height_high + 1)
-
-    def mutate(self, p, sgs):
+    def mutate(self, sgs):
         new_heights_arr = [0] * constants.N_POLY_TUNE
         for i, h in enumerate(self.heights_tuple):
             sgs_greater = sgs[i, :h]
@@ -58,33 +53,23 @@ class Unit:
             if sg_greater == 0 and sg_less == 0:
                 sg_greater = 1
                 sg_less = 1
-            p_greater = p * sg_greater / (sg_greater + sg_less)
-            p_less = p * sg_less / (sg_greater + sg_less)
+            p_greater = constants.P_MUT * sg_greater / (sg_greater + sg_less)
+            p_less = constants.P_MUT * sg_less / (sg_greater + sg_less)
             p = np.random.uniform(0, 1)
             if p <= p_less:
-                new_heights_arr[i] = round(sum(sgs_greater[j] * (j + h + 1) for j in range(len(sgs_greater))) / sg_greater)
+                new_heights_arr[i] = round(sum(sgs_greater[j] * (j + h + 1) 
+                                               for j in range(len(sgs_greater))) / sg_greater)
             elif p > p_less and p <= p_less + p_greater:
-                new_heights_arr[i] = round(sum(sgs_less[j] * j for j in range(len(sgs_less))) / sg_less)
+                new_heights_arr[i] = round(sum(sgs_less[j] * j 
+                                               for j in range(len(sgs_less))) / sg_less)
         return Unit(tuple(new_heights_arr), self.err)
-
-        # p_greater = r
-
-        # new_heights_arr = [Unit._pick_new_height(self.heights_tuple[i], jump_dist)
-        #                    for i in range(constants.N_POLY_TUNE)]
-        # old_heights_arr = list(self.heights_tuple)
-        # p_arr = np.random.uniform(0, 1, constants.N_POLY_TUNE)
-        # lower = p_arr < p
-        # higher = p_arr >= p
-        # return Unit(tuple(lower * new_heights_arr + higher * old_heights_arr), self.err)
 
     def __repr__(self):
         return str(self.heights_tuple)
     
 
 class Trainer:
-    def __init__(self, p, iter):
-        self.popsize = constants.POPSIZE
-        self.p = p
+    def __init__(self, iter):
         self.iter = iter
         self.sgs = np.zeros((constants.N_POLY_TUNE, constants.N_HEIGHTS))
 
@@ -96,7 +81,7 @@ class Trainer:
         self.best_unit_error = np.float64(0)
 
     def initialize_population(self):
-        for _ in range(self.popsize):
+        for _ in range(constants.POPSIZE):
             u = Unit(tuple(np.random.randint(constants.N_HEIGHTS, size=constants.N_POLY_TUNE)))
             self.population.append(u)
         return
@@ -112,9 +97,9 @@ class Trainer:
         probabilities = fitness_vals / sum_fitness
         cumulative_probabilities = np.cumsum(probabilities)
 
-        parent_indices = np.zeros((self.popsize - ELITISM, 2), dtype=int)
-        for i in range(self.popsize - ELITISM):
-            # select two parents
+        parent_indices = np.zeros((constants.POPSIZE - constants.ELITISM, 2), dtype=int)
+        for i in range(constants.POPSIZE - constants.ELITISM):
+            # Select two parents
             for j in range(2):
                 rand_val = np.random.rand()
                 parent_index = np.searchsorted(cumulative_probabilities, rand_val)
@@ -123,46 +108,30 @@ class Trainer:
 
 
     def train_step(self):
-        # MULTIPROCESSING
-        # num_processes = 8
-        # with Pool(processes=num_processes) as pool:
-        #     self.population = list(pool.map(evaluate_unit, self.population, chunksize=int(constants.POPSIZE / num_processes)))
-
-        # MULTITHREADING
-        # num_workers = 4
-        # with ThreadPoolExecutor(max_workers=num_workers) as executor:
-        #     self.population = list(executor.map(evaluate_unit, self.population))
-
         # SINGLE PROCESS, SINGLE THREAD
         for i, u in enumerate(self.population):
             u.evaluate()
-            # m = domain.mesh(u.heights_tuple)
-            # plot(m)
-            # plt.gca().set_aspect('equal')
-            # plt.show()
-            print(f"Goodness of child {i} = {self.population[i]}: {u.goodness}")
             self.update_sgs(u)
+            print(f"Goodness of child {i} = {self.population[i]}: {u.goodness}")
 
-        new_population = []
-
-        new_population = sorted(self.population, key=lambda u:u.goodness, reverse=True)[:ELITISM]
+        sorted_old_population = sorted(self.population, key=lambda u:u.goodness, reverse=True)            
+        new_population = sorted_old_population[:constants.ELITISM]
 
         pairs = self.roulette_wheel_selection()
         for (i, j) in pairs:
-            new_population.append(self.population[i].crossover(self.population[j]).mutate(self.p, self.sgs))
-
-        new_population = sorted(new_population, key=lambda u:float(u.goodness), reverse=True)
-        # print(new_population)
+            new_population.append(self.population[i]
+                                  .crossover(self.population[j])
+                                  .mutate(self.sgs))
 
         self.population = new_population[:]
 
         self.best = max(self.population, key=lambda u: float(u.goodness))
         self.best_unit_error = self.best.err
-
         return
 
     def save_population(self):
-        pop_name = f"population_iter={self.curr_i}_p={self.p}_jump_dist={self.jump_dist}_pop_goodness={(sum(u.goodness for u in self.population)):.3f}.pickle"
+        population_goodness = sum(u.goodness for u in self.population)
+        pop_name = f"population_iter={self.curr_i}_pop_goodness={population_goodness:.3f}.pickle"
         with open(pop_name, 'wb+') as f:
             pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
         return
