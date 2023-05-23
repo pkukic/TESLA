@@ -20,7 +20,8 @@ class SigmaExpr(fe.UserExpression):
         self.new_sigma_function = new_sigma_function
         
     def eval(self, values, x):
-        if x[0] >= constants.DISCARDED_WIDTH_EACH_SIDE and x[0] <= constants.WIDTH - constants.DISCARDED_WIDTH_EACH_SIDE:
+        if x[0] >= constants.DISCARDED_WIDTH_EACH_SIDE and x[0] <= constants.WIDTH - \
+                constants.DISCARDED_WIDTH_EACH_SIDE:
             values[0] = abs(self.new_sigma_function(x[0], x[1]))
         else:
             values[0] = constants.SIGMA_HRS
@@ -47,7 +48,8 @@ class FunctionSolver:
     @staticmethod
     def G(electric_field_values):
         electric_field_values = np.array(electric_field_values, np.float128)
-        return constants.G_0 * np.exp(-(constants.E_A - constants.B * electric_field_values) / (constants.K_B * constants.T))
+        return constants.G_0 * np.exp(-(constants.E_A - constants.B * electric_field_values) / 
+                                      (constants.K_B * constants.T))
     
 
     def new_sigma_from_pc(self, pc_values, old_sigma_values):
