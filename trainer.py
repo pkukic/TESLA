@@ -48,25 +48,45 @@ class Unit:
         height_high = np.clip(height + jump_dist, 0, constants.N_HEIGHTS - 1)
         return np.random.randint(height_low, height_high + 1)
 
-    def mutate(self, p, jump_dist):
-        new_heights_arr = [Unit._pick_new_height(self.heights_tuple[i], jump_dist)
-                           for i in range(constants.N_POLY_TUNE)]
-        old_heights_arr = list(self.heights_tuple)
-        p_arr = np.random.uniform(0, 1, constants.N_POLY_TUNE)
-        lower = p_arr < p
-        higher = p_arr >= p
-        return Unit(tuple(lower * new_heights_arr + higher * old_heights_arr), self.err)
+    def mutate(self, p, sgs):
+        new_heights_arr = [0] * constants.N_POLY_TUNE
+        for i, h in enumerate(self.heights_tuple):
+            sgs_greater = sgs[i, :h]
+            sgs_less = sgs[i, (h + 1):]
+            sg_greater = np.sum(sgs_greater)
+            sg_less = np.sum(sgs_less)
+            if sg_greater == 0 and sg_less == 0:
+                sg_greater = 1
+                sg_less = 1
+            p_greater = p * sg_greater / (sg_greater + sg_less)
+            p_less = p * sg_less / (sg_greater + sg_less)
+            p = np.random.uniform(0, 1)
+            if p <= p_less:
+                new_heights_arr[i] = round(sum(sgs_greater[j] * (j + h + 1) for j in range(len(sgs_greater))) / sg_greater)
+            elif p > p_less and p <= p_less + p_greater:
+                new_heights_arr[i] = round(sum(sgs_less[j] * j for j in range(len(sgs_less))) / sg_less)
+        return Unit(tuple(new_heights_arr), self.err)
+
+        # p_greater = r
+
+        # new_heights_arr = [Unit._pick_new_height(self.heights_tuple[i], jump_dist)
+        #                    for i in range(constants.N_POLY_TUNE)]
+        # old_heights_arr = list(self.heights_tuple)
+        # p_arr = np.random.uniform(0, 1, constants.N_POLY_TUNE)
+        # lower = p_arr < p
+        # higher = p_arr >= p
+        # return Unit(tuple(lower * new_heights_arr + higher * old_heights_arr), self.err)
 
     def __repr__(self):
         return str(self.heights_tuple)
     
 
 class Trainer:
-    def __init__(self, p, jump_dist, iter):
+    def __init__(self, p, iter):
         self.popsize = constants.POPSIZE
         self.p = p
-        self.jump_dist = jump_dist
         self.iter = iter
+        self.sgs = np.zeros((constants.N_POLY_TUNE, constants.N_HEIGHTS))
 
         self.curr_i = 0
         self.from_pickle = False
@@ -79,6 +99,11 @@ class Trainer:
         for _ in range(self.popsize):
             u = Unit(tuple(np.random.randint(constants.N_HEIGHTS, size=constants.N_POLY_TUNE)))
             self.population.append(u)
+        return
+    
+    def update_sgs(self, u):
+        for i, h in enumerate(u.heights_tuple):
+            self.sgs[i][h] += u.goodness
         return
 
     def roulette_wheel_selection(self):
@@ -116,6 +141,7 @@ class Trainer:
             # plt.gca().set_aspect('equal')
             # plt.show()
             print(f"Goodness of child {i} = {self.population[i]}: {u.goodness}")
+            self.update_sgs(u)
 
         new_population = []
 
@@ -123,7 +149,7 @@ class Trainer:
 
         pairs = self.roulette_wheel_selection()
         for (i, j) in pairs:
-            new_population.append(self.population[i].crossover(self.population[j]).mutate(self.p, self.jump_dist))
+            new_population.append(self.population[i].crossover(self.population[j]).mutate(self.p, self.sgs))
 
         new_population = sorted(new_population, key=lambda u:float(u.goodness), reverse=True)
         # print(new_population)
@@ -161,8 +187,7 @@ class Trainer:
 
 
 if __name__ == '__main__':
-    # p = 0.1
-    # jump_distance = 2
+    # p = 0.3
     # iters = 20
     # t = Trainer(p, jump_distance, iters)
 
