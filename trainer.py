@@ -2,9 +2,6 @@ from dolfin import plot
 import numpy as np
 import pickle
 
-from multiprocessing import Pool
-from concurrent.futures import ThreadPoolExecutor
-
 import matplotlib
 matplotlib.use('Qt5Agg')
 
@@ -14,24 +11,23 @@ import sim
 import constants
 import domain
 
-ELITISM = 2
 
 class Unit:
     def __init__(self, heights_tuple, init_err = None):
         self.heights_tuple = heights_tuple
         if init_err is None:
-            self.err = np.float64(1e9)
+            self.err = np.float64(1/constants.EPS_VAR)
         else:
             self.err = init_err
         self.goodness = -np.log10(self.err)
 
     @staticmethod    
     def eps():
-        return abs(np.random.normal(0.0, 1e-9))
+        return abs(np.random.normal(0.0, constants.EPS_VAR))
 
     def evaluate(self):
         print(f"Evaluating: {self}")
-        err = sim.error_from_n_sims(constants.N_SIMS_PER_UNIT, self.heights_tuple)
+        err = sim.error_from_n_sims(constants.N_ITER, self.heights_tuple)
         self.err = err + Unit.eps()
         self.goodness = -np.log10(self.err)
         return
@@ -130,8 +126,8 @@ class Trainer:
         return
 
     def save_population(self):
-        population_goodness = sum(u.goodness for u in self.population)
-        pop_name = f"population_iter={self.curr_i}_pop_goodness={population_goodness:.3f}.pickle"
+        pop_goodness = sum(u.goodness for u in self.population)
+        pop_name = f"population_iter={self.curr_i}_pop_goodness={pop_goodness:.3f}.pickle"
         with open(pop_name, 'wb+') as f:
             pickle.dump(self, f, protocol=pickle.HIGHEST_PROTOCOL)
         return

@@ -89,6 +89,17 @@ class PoissonSolver:
 
 
 if __name__ == '__main__':
+
+    params = {"ytick.color" : "black",
+          "xtick.color" : "black",
+          "axes.labelcolor" : "black",
+          "axes.edgecolor" : "black",
+          "text.usetex" : True,
+          "font.family" : "serif",
+          "font.serif" : ["Computer Modern Serif"]}
+    plt.rcParams.update(params)
+
+
     height_arr = tuple([2*i for i in range(4)] + [16-2*i for i in range(4, 9)])
     print(len(height_arr))
     print(height_arr)
@@ -100,9 +111,18 @@ if __name__ == '__main__':
     e_vect = ps.E_from_sigma(sigma, top_potential)
     e = ps.magnitude_of_E(e_vect)
 
+    plt.figure().set_figwidth(16)
     c = plot(e, cmap='inferno')
-    plt.gca().set_aspect('equal')
-    plt.colorbar(c, fraction=0.047*1/10)
+    ax = plt.gca()
+    ax.set_aspect('equal')
+    ax.set_xlim([100, 600])
+    ax.set_ylim([0, 50])
+    ax.set_yticks([0, 10, 20, 30, 40, 50])
+    ax.set_xlabel(r"x [$\AA$]")
+    ax.set_ylabel(r"y [$\AA$]")
+    ax.xaxis.set_major_formatter(lambda x, pos: str(int(x - 100)))
+    plt.colorbar(c, fraction=0.047*1/10, label=r"E [V / $\AA$]")
+    plt.savefig("poisson_solution.png",bbox_inches='tight', dpi=1200)
     plt.show()
 
 

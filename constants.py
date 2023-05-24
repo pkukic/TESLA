@@ -84,10 +84,13 @@ N_POLY_TUNE = 9
 N_HEIGHTS = 11
 
 # Number of simulations run to establish the goodness of a unit
-N_SIMS_PER_UNIT = 20
+N_ITER = 20
 
 # Number of units directly passed on to the next generation
 ELITISM = 2
 
 # Probability of a mutation
 P_MUT = 0.3
+
+# Variance of small Gaussian noise
+EPS_VAR = 1 * 1e-9
