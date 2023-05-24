@@ -112,7 +112,7 @@ if __name__ == '__main__':
     e = ps.magnitude_of_E(e_vect)
 
     plt.figure().set_figwidth(16)
-    c = plot(e, cmap='inferno')
+    c = plot(e, cmap='jet')
     ax = plt.gca()
     ax.set_aspect('equal')
     ax.set_xlim([100, 600])
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     ax.set_ylabel(r"y [$\AA$]")
     ax.xaxis.set_major_formatter(lambda x, pos: str(int(x - 100)))
     plt.colorbar(c, fraction=0.047*1/10, label=r"E [V / $\AA$]")
-    plt.savefig("poisson_solution.png",bbox_inches='tight', dpi=1200)
+    plt.savefig("poisson_solution_2.png",bbox_inches='tight', dpi=1200)
     plt.show()
 
 
