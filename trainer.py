@@ -46,18 +46,15 @@ class Unit:
             sgs_less = sgs[i, (h + 1):]
             sg_greater = np.sum(sgs_greater)
             sg_less = np.sum(sgs_less)
-            if sg_greater == 0 and sg_less == 0:
-                sg_greater = 1
-                sg_less = 1
             p_greater = constants.P_MUT * sg_greater / (sg_greater + sg_less)
             p_less = constants.P_MUT * sg_less / (sg_greater + sg_less)
             p = np.random.uniform(0, 1)
             if p <= p_less:
-                new_heights_arr[i] = round(sum(sgs_greater[j] * (j + h + 1) 
-                                               for j in range(len(sgs_greater))) / sg_greater)
-            elif p > p_less and p <= p_less + p_greater:
-                new_heights_arr[i] = round(sum(sgs_less[j] * j 
+                new_heights_arr[i] = round(sum(sgs_less[j] * (j + h + 1) 
                                                for j in range(len(sgs_less))) / sg_less)
+            elif p > p_less and p <= p_less + p_greater:
+                new_heights_arr[i] = round(sum(sgs_greater[j] * j 
+                                               for j in range(len(sgs_greater))) / sg_greater)
         return Unit(tuple(new_heights_arr), self.err)
 
     def __repr__(self):
@@ -87,10 +84,14 @@ class Trainer:
             self.sgs[i][h] += u.goodness
         return
 
-    def roulette_wheel_selection(self):
+    def selection(self):
         fitness_vals = np.array([u.goodness for u in self.population])
-        sum_fitness = np.sum(fitness_vals)
-        probabilities = fitness_vals / sum_fitness
+        order = fitness_vals.argsort()
+        ranks = len(order) - order.argsort()
+        ranks_exp = np.power(constants.C, ranks)
+        ranks_sum = np.sum(ranks_exp)
+        probabilities = ranks_exp / ranks_sum
+
         cumulative_probabilities = np.cumsum(probabilities)
 
         parent_indices = np.zeros((constants.POPSIZE - constants.ELITISM, 2), dtype=int)
@@ -113,7 +114,7 @@ class Trainer:
         sorted_old_population = sorted(self.population, key=lambda u:u.goodness, reverse=True)            
         new_population = sorted_old_population[:constants.ELITISM]
 
-        pairs = self.roulette_wheel_selection()
+        pairs = self.selection()
         for (i, j) in pairs:
             new_population.append(self.population[i]
                                   .crossover(self.population[j])
@@ -152,18 +153,15 @@ class Trainer:
 
 
 if __name__ == '__main__':
-    # p = 0.3
-    # iters = 20
-    # t = Trainer(p, jump_distance, iters)
+    iters = 100
+    t = Trainer(iters)
+    t.train()
 
-    t = Trainer.load('/home/patrik/Drive/Current/Završni/Neuromorphic computing/Code/novo/TESLA/population_iter=6_p=0.1_jump_dist=2_pop_goodness=106.519.pickle')
-
-    print(t.best)
+    b = t.best
+    print(b)
+    print(b.goodness)
     print(sum(u.goodness for u in t.population))
 
-    # t.train()
-    b = t.best
-    print(b.goodness)
     m = domain.mesh(b.heights_tuple)
 
     plot(m)

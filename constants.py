@@ -94,3 +94,6 @@ P_MUT = 0.3
 
 # Variance of small Gaussian noise
 EPS_VAR = 1 * 1e-9
+
+# Power in exponential ranking
+C = 0.97
